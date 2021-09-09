@@ -1,5 +1,6 @@
 export const extensionWebsiteDomains = [
 	"phantombuster.com",
+	"v2staging.phantombuster.io",
 	"zapier.com",
 	// "facebook.com",
 	// "github.com",
