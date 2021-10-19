@@ -220,12 +220,5 @@ const cookieChanged = async (changeInfo: Cookies.OnChangedChangeInfoType, websit
 
 // opens phantombuster in a new tab when clicking on the extension icon
 browser.browserAction.onClicked.addListener(async (_tab) => {
-	const pbCookie = (await browser.cookies.getAll({})).find(
-		(cookie) => cookie.domain == "api.phantombuster.com" && cookie.name === "session"
-	);
-	await browser.tabs.create({
-		url: pbCookie
-		? "https://phantombuster.com/phantoms"
-		: "https://phantombuster.com",
-	});
+	await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
 })
