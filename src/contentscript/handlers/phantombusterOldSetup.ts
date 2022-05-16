@@ -1,5 +1,4 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
-// import { getSpinner } from "../../shared/spinner"
 import { IWebsite, WebsiteName, getWebsiteFromUrl } from "../../shared/websites"
 import { Handler } from "./handler"
 import { Cookies } from "webextension-polyfill-ts"
@@ -87,7 +86,6 @@ export class PhantombusterOldSetup extends Handler {
 		foundWebsite.login = true
 		for (const element of foundWebsite.elements) {
 			element.btn.textContent = `Please log in to ${foundWebsite.website.name}`
-			// element.btn.appendChild(getSpinner())
 			element.input.style.paddingRight = (element.btn.offsetWidth + 18).toString(10) + "px"
 		}
 		void this.sendMessage({ notif: { message: `Please log in to ${foundWebsite.website.name}` } })
