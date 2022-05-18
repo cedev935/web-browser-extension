@@ -1,5 +1,4 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
-// import { getSpinner } from "../../shared/spinner"
 import { IWebsite, WebsiteName, getWebsiteFromName } from "../../shared/websites"
 import { Handler } from "./handler"
 import { Cookies } from "webextension-polyfill-ts"
@@ -85,7 +84,6 @@ export class PhantombusterNewSetup extends Handler {
 		for (const element of foundWebsite.elements) {
 			element.btn.textContent = `Please log in to ${foundWebsite.website.name}`
 			// element.btn.classList.add("pr-10")
-			// element.btn.appendChild(getSpinner())
 		}
 		void this.sendMessage({ notif: { message: `Please log in to ${foundWebsite.website.name}` } })
 		void this.sendMessage({
@@ -130,7 +128,7 @@ export class PhantombusterNewSetup extends Handler {
 
 	private _createGetCookieBtn(website: IWebsite) {
 		const el = document.createElement("button")
-		el.className = `${this._getCookieButtonClass} btn br-4 bg-dark-blue text-nowrap relative f5 mx-1 my-1`
+		el.className = this._getCookieButtonClass
 		el.type = "button"
 		el.setAttribute("analyticsid", "agentSetupStepsInputGetcookieBtn")
 		el.setAttribute("analyticsval1", website.name)
