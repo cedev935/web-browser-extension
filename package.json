@@ -5,11 +5,11 @@
 	"main": "index.js",
 	"scripts": {
 		"build:contentscript-background": "NODE_ENV=production webpack --config webpack.config.js",
-		"build:beta": "cpy dist beta && jq -s '.[0] * .[1]' dist/manifest.json manifest.beta.json > beta/manifest.json",
+		"build:beta": "cpy dist/*.js dist/*.css beta && jq -s '.[0] * .[1]' dist/manifest.json manifest.beta.json > beta/manifest.json",
 		"build": "npm-run-all build:contentscript-background build:beta",
 		"watch:contentscript-background": "NODE_ENV=development webpack --config webpack.config.js -w",
 		"watch": "npm-run-all -p watch:*",
-		"clean": "rm -rf dist extension.zip && cpy manifest.json dist && cpy src/assets/* dist/assets",
+		"clean": "rm -rf dist beta *.zip && cpy manifest.json dist && cpy src/assets/* dist/assets && cpy src/assets/* beta/assets",
 		"prebuild": "npm run clean",
 		"prewatch": "npm run clean",
 		"zip:release": "cd dist && bestzip ../release.zip *",
