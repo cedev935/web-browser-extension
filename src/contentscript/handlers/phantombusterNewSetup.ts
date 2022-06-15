@@ -128,7 +128,7 @@ export class PhantombusterNewSetup extends Handler {
 
 	private _createGetCookieBtn(website: IWebsite) {
 		const el = document.createElement("button")
-		el.className = this._getCookieButtonClass
+		el.className = `${this._getCookieButtonClass} btn br-4 bg-dark-blue text-nowrap relative f5 mx-1 my-1`
 		el.type = "button"
 		el.setAttribute("analyticsid", "agentSetupStepsInputGetcookieBtn")
 		el.setAttribute("analyticsval1", website.name)
