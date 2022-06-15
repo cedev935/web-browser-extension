@@ -11,3 +11,4 @@ dist/
 build/
 js/
 *.env
+beta/
