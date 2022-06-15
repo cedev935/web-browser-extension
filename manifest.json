@@ -1,13 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "Phantombuster",
-	"version": "1.1.4",
+	"version": "1.1.5.1",
 	"description": "Makes Phantombuster easier to use by automatically retrieving your session cookies",
-	"browser_specific_settings": {
-		"gecko": {
-			"update_url": "https://raw.githubusercontent.com/phantombuster/web-browser-extension/beta/beta-updates.json"
-		}
-	},
 	"icons": {
 		"48":"assets/buster-icon-48.png",
 		"128": "assets/buster-icon.png"
