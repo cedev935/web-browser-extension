@@ -3,10 +3,10 @@ import { Handler } from "./handler"
 import {version} from '../../../manifest.json'
 
 export class Phantombuster extends Handler {
-	private _hostRegex = RegExp("phantombuster\.(com|io)")
+	private _titleRegex = /PhantomBuster/
 
 	public detect() {
-		return this._hostRegex.test(window.location.host)
+		return this._titleRegex.test(document.title)
 	}
 
 	public onMessage(_msg: FromBackgroundRuntimeMessages) {
