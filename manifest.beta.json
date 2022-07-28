@@ -1,6 +1,6 @@
 {
 	"name": "PhantomBuster BETA",
-	"version_name": "1.1.5",
+	"version_name": "1.1.6",
 	"browser_specific_settings": {
 		"gecko": {
 			"update_url": "https://raw.githubusercontent.com/phantombuster/web-browser-extension/beta/beta-updates.json"
