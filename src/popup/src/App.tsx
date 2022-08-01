@@ -35,7 +35,7 @@ const Home: FunctionComponent = () => {
 				<ul>
 					<li className="text-align-center">
 						<A className="block w-full py-3 hover:bg-grey-5" href="https://phantombuster.com">
-							Open Phantombuster
+							Open PhantomBuster
 						</A>
 					</li>
 				</ul>
