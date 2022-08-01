@@ -22,7 +22,7 @@ type IFoundWebsites = {
 export class PhantombusterOldSetup extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
-	private _hostRegex = RegExp("phantombuster\.(com|io)")
+	private _titleRegex = /\| PhantomBuster$/
 	private _pathnameRegex = RegExp("\/setup(?!\/step)")
 	private _interval?: ReturnType<typeof setInterval>
 	private _alpacaFieldSessionCookieDivSelector = "div[data-alpaca-field-path*=\"/sessionCookie\"]"
@@ -44,7 +44,7 @@ export class PhantombusterOldSetup extends Handler {
 		 * created in run() should be stopped in detroy().
 		*/
 		return (
-			this._hostRegex.test(window.location.host) &&
+			this._titleRegex.test(document.title) &&
 			this._pathnameRegex.test(window.location.pathname)
 		)
 	}

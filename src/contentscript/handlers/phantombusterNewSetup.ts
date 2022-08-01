@@ -26,7 +26,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
-	private _hostRegex = RegExp("phantombuster\.(com|io)")
+	private _titleRegex = /\| PhantomBuster$/
 	private _pathnameRegex = RegExp("\/setup\/step")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieDivSelector = "div[id^=\"formField-sessionCookie\"]"
@@ -41,7 +41,7 @@ export class PhantombusterNewSetup extends Handler {
 
 	public detect = () => {
 		return (
-			this._hostRegex.test(window.location.host) &&
+			this._titleRegex.test(document.title) &&
 			this._pathnameRegex.test(window.location.pathname)
 		)
 	}

@@ -3,7 +3,7 @@ import { Handler } from "./handler"
 import {version} from '../../../manifest.json'
 
 export class Phantombuster extends Handler {
-	private _titleRegex = /PhantomBuster/
+	private _titleRegex = /\| PhantomBuster$/
 
 	public detect() {
 		return this._titleRegex.test(document.title)

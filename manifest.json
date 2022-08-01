@@ -22,7 +22,8 @@
 			"matches": [
 				"*://*.phantombuster.com/*",
 				"*://*.phantombuster.io/*",
-				"*://*.zapier.com/*"
+				"*://*.zapier.com/*",
+				"*://localhost/*"
 			],
 			"run_at": "document_end",
 			"js": ["contentscript.js"],

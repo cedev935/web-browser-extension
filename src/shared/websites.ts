@@ -2,6 +2,7 @@ export const extensionWebsiteDomains = [
 	"phantombuster.com",
 	"v2staging.phantombuster.io",
 	"zapier.com",
+	"localhost"
 	// "facebook.com",
 	// "github.com",
 	// "instagram.com",
