@@ -160,3 +160,8 @@ export const getWebsiteInString = (name: string) => {
 	}
 	return null
 }
+
+export const isPhantombusterSite = () => {
+	const siteNameMeta: HTMLMetaElement | null = document.querySelector('meta[property="og:site_name"]')
+	return siteNameMeta?.content === "PhantomBuster"
+}

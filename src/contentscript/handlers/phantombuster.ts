@@ -1,12 +1,12 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { Handler } from "./handler"
 import {version} from '../../../manifest.json'
+import { isPhantombusterSite } from "../../shared/websites"
 
 export class Phantombuster extends Handler {
-	private _titleRegex = /\| PhantomBuster$/
 
 	public detect() {
-		return this._titleRegex.test(document.title)
+		return isPhantombusterSite()
 	}
 
 	public onMessage(_msg: FromBackgroundRuntimeMessages) {

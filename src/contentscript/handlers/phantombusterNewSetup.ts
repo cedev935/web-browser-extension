@@ -1,5 +1,5 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
-import { IWebsite, WebsiteName, getWebsiteFromName } from "../../shared/websites"
+import { IWebsite, WebsiteName, getWebsiteFromName, isPhantombusterSite } from "../../shared/websites"
 import { Handler } from "./handler"
 import { Cookies } from "webextension-polyfill-ts"
 
@@ -26,7 +26,6 @@ export class PhantombusterNewSetup extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
-	private _titleRegex = /\| PhantomBuster$/
 	private _pathnameRegex = RegExp("\/setup\/step")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieDivSelector = "div[id^=\"formField-sessionCookie\"]"
@@ -41,7 +40,7 @@ export class PhantombusterNewSetup extends Handler {
 
 	public detect = () => {
 		return (
-			this._titleRegex.test(document.title) &&
+			isPhantombusterSite() &&
 			this._pathnameRegex.test(window.location.pathname)
 		)
 	}
