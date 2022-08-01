@@ -7,7 +7,9 @@ declare global {
 	}
 }
 
-const documentCookie = Object.getOwnPropertyDescriptor(Document.prototype, "cookie") || Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "cookie")
+const documentCookie =
+	Object.getOwnPropertyDescriptor(Document.prototype, "cookie") ||
+	Object.getOwnPropertyDescriptor(HTMLDocument.prototype, "cookie")
 const cookieGetter = documentCookie?.get
 const cookieSetter = documentCookie?.set
 

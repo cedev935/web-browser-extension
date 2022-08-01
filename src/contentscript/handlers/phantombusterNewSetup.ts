@@ -26,9 +26,9 @@ export class PhantombusterNewSetup extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
-	private _pathnameRegex = RegExp("\/setup\/step")
+	private _pathnameRegex = RegExp("/setup/step")
 	private _interval?: ReturnType<typeof setInterval>
-	private _stepSetupSessionCookieDivSelector = "div[id^=\"formField-sessionCookie\"]"
+	private _stepSetupSessionCookieDivSelector = 'div[id^="formField-sessionCookie"]'
 	private _stepSetupSessionCookieInnerDivSelector = "div"
 	private _stepSetupSessionCookieInputSelector = "input"
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
@@ -39,10 +39,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _foundWebsites: IFoundWebsites = {}
 
 	public detect = () => {
-		return (
-			isPhantombusterSite() &&
-			this._pathnameRegex.test(window.location.pathname)
-		)
+		return isPhantombusterSite() && this._pathnameRegex.test(window.location.pathname)
 	}
 
 	public onMessage = (msg: FromBackgroundRuntimeMessages) => {
@@ -90,7 +87,7 @@ export class PhantombusterNewSetup extends Handler {
 				websiteName: foundWebsite.website.name,
 				url: foundWebsite.website.url,
 				newSession,
-			}
+			},
 		})
 	}
 
@@ -117,12 +114,16 @@ export class PhantombusterNewSetup extends Handler {
 				}
 				foundWebsite.elements[i].input.dispatchEvent(new Event("input", { bubbles: true }))
 				if (!foundWebsite.elements[i].inputListener) {
-					foundWebsite.elements[i].inputListener = () => { this._onInputChange(foundWebsite.elements) }
+					foundWebsite.elements[i].inputListener = () => {
+						this._onInputChange(foundWebsite.elements)
+					}
 				}
 				foundWebsite.elements[i].input.addEventListener("input", foundWebsite.elements[i].inputListener!)
 			}
 		}
-		void this.sendMessage({ notif: { message: `${this._phantomName} is now connected to ${foundWebsite.website.name}` } })
+		void this.sendMessage({
+			notif: { message: `${this._phantomName} is now connected to ${foundWebsite.website.name}` },
+		})
 	}
 
 	private _createGetCookieBtn(website: IWebsite) {
@@ -145,7 +146,7 @@ export class PhantombusterNewSetup extends Handler {
 					getCookies: {
 						websiteName: website.name,
 						newSession: event.shiftKey,
-					}
+					},
 				})
 			}
 			el.onmouseover = (event: MouseEvent) => {
@@ -168,7 +169,9 @@ export class PhantombusterNewSetup extends Handler {
 	}
 
 	private _handleStepSetupFieldDiv = (stepSetupDiv: HTMLDivElement) => {
-		const stepSetupInnerDiv = stepSetupDiv?.querySelector<HTMLDivElement>(this._stepSetupSessionCookieInnerDivSelector)
+		const stepSetupInnerDiv = stepSetupDiv?.querySelector<HTMLDivElement>(
+			this._stepSetupSessionCookieInnerDivSelector,
+		)
 		const stepSetupInput = stepSetupDiv?.querySelector<HTMLInputElement>(this._stepSetupSessionCookieInputSelector)
 		const fieldInfos = stepSetupDiv.dataset.fieldInfo?.split("/")
 
@@ -222,7 +225,9 @@ export class PhantombusterNewSetup extends Handler {
 	}
 
 	private _findStepSetupFieldSessionCookies = () => {
-		const stepSetupDivs = Array.from(document.querySelectorAll<HTMLDivElement>(this._stepSetupSessionCookieDivSelector))
+		const stepSetupDivs = Array.from(
+			document.querySelectorAll<HTMLDivElement>(this._stepSetupSessionCookieDivSelector),
+		)
 
 		if (this._interval && stepSetupDivs.length) {
 			clearInterval(this._interval)

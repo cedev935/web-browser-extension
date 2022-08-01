@@ -1,10 +1,9 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { Handler } from "./handler"
-import { version } from '../../../manifest.json'
+import { version } from "../../../manifest.json"
 import { isPhantombusterSite } from "../../shared/websites"
 
 export class Phantombuster extends Handler {
-
 	public detect() {
 		return isPhantombusterSite()
 	}

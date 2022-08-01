@@ -27,25 +27,23 @@ type IFoundWebsites = {
 export class ZapierCustomizeLaunch extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
-	private _hostRegex = RegExp("zapier\.com$")
-	private _pathnameRegex = RegExp("\/app\/editor\/\\d+\/nodes\/\\d+\/fields")
+	private _hostRegex = RegExp("zapier.com$")
+	private _pathnameRegex = RegExp("/app/editor/\\d+/nodes/\\d+/fields")
 	private _mainInterval?: ReturnType<typeof setInterval>
 	private _phantomSelectInterval?: ReturnType<typeof setInterval>
 	private _waitBlurInterval?: ReturnType<typeof setInterval>
-	private _customizeLaunchPhantomNameSpanSelector = "div[class*=\"-FieldsForm\"] div[class*=\"-Dropdown\"] button span"
-	private _customizeLaunchSessionCookieDivXpath = "//fieldset//div[contains(@class, '-FieldsForm') and contains(.//span, 'Session Cookie')]/div"
-	private _customizeLaunchSessionCookieLabelDivSelector = "div[class*=\"-Field__revealWrapper\"]"
-	private _customizeLaunchSessionCookieLabelSpanSelector = "span[class*=\"-FieldsForm__label\"]"
-	private _customizeLaunchSessionCookieCodeMirrorDivSelector = "div[class*=\"-FieldsForm\"]"
+	private _customizeLaunchPhantomNameSpanSelector = 'div[class*="-FieldsForm"] div[class*="-Dropdown"] button span'
+	private _customizeLaunchSessionCookieDivXpath =
+		"//fieldset//div[contains(@class, '-FieldsForm') and contains(.//span, 'Session Cookie')]/div"
+	private _customizeLaunchSessionCookieLabelDivSelector = 'div[class*="-Field__revealWrapper"]'
+	private _customizeLaunchSessionCookieLabelSpanSelector = 'span[class*="-FieldsForm__label"]'
+	private _customizeLaunchSessionCookieCodeMirrorDivSelector = 'div[class*="-FieldsForm"]'
 	private _getCookieButtonClass = "pbExtensionZapierCookieButton"
 
 	private _foundWebsites: IFoundWebsites = {}
 
 	public detect = () => {
-		return (
-			this._hostRegex.test(window.location.host) &&
-			this._pathnameRegex.test(window.location.pathname)
-		)
+		return this._hostRegex.test(window.location.host) && this._pathnameRegex.test(window.location.pathname)
 	}
 
 	public onMessage = (msg: FromBackgroundRuntimeMessages) => {
@@ -86,7 +84,7 @@ export class ZapierCustomizeLaunch extends Handler {
 	private _watchPhantomSelect = () => {
 		if (!this._phantomSelectInterval) {
 			this._phantomSelectInterval = setInterval(() => {
-				const floatingMenu = document.querySelector("div[class*=\"FloatingMenu\"]")
+				const floatingMenu = document.querySelector('div[class*="FloatingMenu"]')
 				if (floatingMenu) {
 					floatingMenu.addEventListener("click", this._waitWhileBlur)
 				}
@@ -117,7 +115,7 @@ export class ZapierCustomizeLaunch extends Handler {
 				websiteName: foundWebsite.website.name,
 				url: foundWebsite.website.url,
 				newSession,
-			}
+			},
 		})
 	}
 
@@ -141,12 +139,18 @@ export class ZapierCustomizeLaunch extends Handler {
 				injectFunction(injectFillInputFunction, [foundWebsite.elements[i].codeMirrorDivClass, cookies[i].value])
 
 				if (foundWebsite.elements[i].inputListener) {
-					foundWebsite.elements[i].codeMirrorDiv.querySelector("textarea")?.removeEventListener("input", foundWebsite.elements[i].inputListener!)
+					foundWebsite.elements[i].codeMirrorDiv
+						.querySelector("textarea")
+						?.removeEventListener("input", foundWebsite.elements[i].inputListener!)
 				}
 				if (!foundWebsite.elements[i].inputListener) {
-					foundWebsite.elements[i].inputListener = () => { this._onInputChange(foundWebsite.elements) }
+					foundWebsite.elements[i].inputListener = () => {
+						this._onInputChange(foundWebsite.elements)
+					}
 				}
-				foundWebsite.elements[i].codeMirrorDiv.querySelector("textarea")?.addEventListener("input", foundWebsite.elements[i].inputListener!)
+				foundWebsite.elements[i].codeMirrorDiv
+					.querySelector("textarea")
+					?.addEventListener("input", foundWebsite.elements[i].inputListener!)
 			}
 		}
 		void this.sendMessage({ notif: { message: `Connected to ${foundWebsite.website.name}` } })
@@ -165,25 +169,47 @@ export class ZapierCustomizeLaunch extends Handler {
 				getCookies: {
 					websiteName: website.name,
 					newSession: event.shiftKey,
-				}
+				},
 			})
 		}
 
 		return el
 	}
 
-	private _handleCustomizeLaunchFieldDiv = (customizeLaunchDiv: HTMLDivElement, foundWebsite: IWebsite, index: number) => {
-		const customizeLaunchLabelDiv = customizeLaunchDiv.querySelector<HTMLDivElement>(this._customizeLaunchSessionCookieLabelDivSelector)
-		const customizeLaunchLabelSpan = customizeLaunchDiv.querySelector<HTMLSpanElement>(this._customizeLaunchSessionCookieLabelSpanSelector)
-		const customizeLaunchCodeMirrorDiv = customizeLaunchDiv.querySelector<HTMLDivElement>(this._customizeLaunchSessionCookieCodeMirrorDivSelector)
+	private _handleCustomizeLaunchFieldDiv = (
+		customizeLaunchDiv: HTMLDivElement,
+		foundWebsite: IWebsite,
+		index: number,
+	) => {
+		const customizeLaunchLabelDiv = customizeLaunchDiv.querySelector<HTMLDivElement>(
+			this._customizeLaunchSessionCookieLabelDivSelector,
+		)
+		const customizeLaunchLabelSpan = customizeLaunchDiv.querySelector<HTMLSpanElement>(
+			this._customizeLaunchSessionCookieLabelSpanSelector,
+		)
+		const customizeLaunchCodeMirrorDiv = customizeLaunchDiv.querySelector<HTMLDivElement>(
+			this._customizeLaunchSessionCookieCodeMirrorDivSelector,
+		)
 
-		if (customizeLaunchLabelDiv && customizeLaunchCodeMirrorDiv && customizeLaunchLabelSpan && customizeLaunchLabelSpan.textContent) {
+		if (
+			customizeLaunchLabelDiv &&
+			customizeLaunchCodeMirrorDiv &&
+			customizeLaunchLabelSpan &&
+			customizeLaunchLabelSpan.textContent
+		) {
 			const labelName = customizeLaunchLabelSpan.textContent
 			const btn = this._createGetCookieBtn(foundWebsite)
 
 			const codeMirrorDivClass = `pbExtensionCodeMirrorDivClass${index.toString()}`
 			customizeLaunchCodeMirrorDiv.classList.add(codeMirrorDivClass)
-			const elements = { labelName, div: customizeLaunchDiv, labelDiv: customizeLaunchLabelDiv, codeMirrorDiv: customizeLaunchCodeMirrorDiv, codeMirrorDivClass, btn }
+			const elements = {
+				labelName,
+				div: customizeLaunchDiv,
+				labelDiv: customizeLaunchLabelDiv,
+				codeMirrorDiv: customizeLaunchCodeMirrorDiv,
+				codeMirrorDivClass,
+				btn,
+			}
 
 			if (!this._foundWebsites[foundWebsite.name]) {
 				this._foundWebsites[foundWebsite.name] = { website: foundWebsite, login: false, elements: [elements] }
@@ -195,7 +221,13 @@ export class ZapierCustomizeLaunch extends Handler {
 
 	private _getCustomizeLaunchDivs = () => {
 		const customizeLaunchDivs = []
-		const query = document.evaluate(this._customizeLaunchSessionCookieDivXpath, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null )
+		const query = document.evaluate(
+			this._customizeLaunchSessionCookieDivXpath,
+			document,
+			null,
+			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+			null,
+		)
 		let element
 		do {
 			element = query.iterateNext() as HTMLDivElement
@@ -208,7 +240,9 @@ export class ZapierCustomizeLaunch extends Handler {
 
 	private _findWebsite = () => {
 		let website
-		const customizeLaunchPhantomNameSpan = document.querySelector<HTMLSpanElement>(this._customizeLaunchPhantomNameSpanSelector)
+		const customizeLaunchPhantomNameSpan = document.querySelector<HTMLSpanElement>(
+			this._customizeLaunchPhantomNameSpanSelector,
+		)
 		if (customizeLaunchPhantomNameSpan && customizeLaunchPhantomNameSpan.textContent) {
 			website = getWebsiteInString(customizeLaunchPhantomNameSpan.textContent)
 		}
@@ -251,13 +285,13 @@ interface ICodeMirrorDiv extends HTMLDivElement {
 }
 
 const injectFillInputFunction = (values: string[]) => {
-	const codeMirrorDivClass= values[0]
-	const cookieValue= values[1]
+	const codeMirrorDivClass = values[0]
+	const cookieValue = values[1]
 
 	const codeMirrorDiv = document.querySelector<HTMLDivElement>(`.${codeMirrorDivClass}`)
 
 	if (codeMirrorDiv) {
-		codeMirrorDiv.querySelector<HTMLDivElement>("div[class*=\"Input\"] div")?.focus()
+		codeMirrorDiv.querySelector<HTMLDivElement>('div[class*="Input"] div')?.focus()
 		codeMirrorDiv.querySelector<ICodeMirrorDiv>(".CodeMirror")?.CodeMirror?.setValue(cookieValue)
 	}
 }

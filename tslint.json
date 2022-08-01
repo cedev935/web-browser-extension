@@ -1,8 +1,6 @@
 {
 	"defaultSeverity": "error",
-	"extends": [
-		"tslint:recommended"
-	],
+	"extends": ["tslint:recommended"],
 	"jsRules": {},
 	"rules": {
 		"quotemark": [true, "double", "avoid-template"],
@@ -10,7 +8,25 @@
 		"indent": [true, "tabs"],
 		"no-var-requires": false,
 		"variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
-		"no-console": [true, "assert", "clear", "count", "debug", "dir", "dirxml", "group", "groupCollapsed", "groupEnd", "info", "log", "table", "time", "timeEnd", "trace", "warn"],
+		"no-console": [
+			true,
+			"assert",
+			"clear",
+			"count",
+			"debug",
+			"dir",
+			"dirxml",
+			"group",
+			"groupCollapsed",
+			"groupEnd",
+			"info",
+			"log",
+			"table",
+			"time",
+			"timeEnd",
+			"trace",
+			"warn"
+		],
 		"no-any": true,
 		"ordered-imports": false,
 		"max-classes-per-file": false,
@@ -23,10 +39,11 @@
 		"no-duplicate-imports": true,
 		"cyclomatic-complexity": [true, 10],
 		"no-magic-numbers": true,
-		"ban": [true,
-			{ "name": ["browser", "tabs", "sendMessage"], "message": "Use sendMessage() instead."},
-			{ "name": ["browser", "runtime", "sendMessage"], "message": "Use this.sendMessage() instead."},
-			{ "name": ["browser", "notifications", "create"], "message": "Use sendNotification() instead"}
+		"ban": [
+			true,
+			{ "name": ["browser", "tabs", "sendMessage"], "message": "Use sendMessage() instead." },
+			{ "name": ["browser", "runtime", "sendMessage"], "message": "Use this.sendMessage() instead." },
+			{ "name": ["browser", "notifications", "create"], "message": "Use sendNotification() instead" }
 		]
 	},
 	"rulesDirectory": []

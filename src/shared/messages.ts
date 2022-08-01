@@ -27,7 +27,7 @@ type FromContentScriptRuntimeMessages = {
 		newSession: boolean
 	}
 
-	notif? : {
+	notif?: {
 		title?: string
 		message: string
 	}

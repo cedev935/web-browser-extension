@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts"
 
-const headElement = (document.head || document.documentElement)
+const headElement = document.head || document.documentElement
 
 export const injectJsFile = (fileName: string) => {
 	const s = document.createElement("script")
