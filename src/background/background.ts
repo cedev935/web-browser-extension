@@ -41,7 +41,7 @@ const sendMessage = async (tabId: number, msg: FromBackgroundRuntimeMessages) =>
 // Function to be used to send notifications instead of browser.notifications.create()
 const sendNotification = (title: string, message: string) => {
 	// tslint:disable-next-line:ban
-	browser.notifications.create({ type: "basic", message, title, iconUrl: "assets/buster-icon.png", }).catch((error: Error) => {
+	browser.notifications.create({ type: "basic", message, title, iconUrl: "assets/buster-icon-48.png", }).catch((error: Error) => {
 		console.error(error)
 	})
 }

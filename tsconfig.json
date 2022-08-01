@@ -18,7 +18,8 @@
 	"strictBindCallApply": true,
 	"strictFunctionTypes": true,
 	"strictPropertyInitialization": true,
-	"strictNullChecks": true
+	"strictNullChecks": true,
+	"resolveJsonModule": true
   },
   "include": ["src/background", "src/contentscript", "src/inject"]
 }

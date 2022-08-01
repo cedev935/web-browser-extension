@@ -1,11 +1,12 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { Handler } from "./handler"
+import { version } from '../../../manifest.json'
+import { isPhantombusterSite } from "../../shared/websites"
 
 export class Phantombuster extends Handler {
-	private _hostRegex = RegExp("phantombuster\.(com|io)")
 
 	public detect() {
-		return this._hostRegex.test(window.location.host)
+		return isPhantombusterSite()
 	}
 
 	public onMessage(_msg: FromBackgroundRuntimeMessages) {
@@ -17,7 +18,7 @@ export class Phantombuster extends Handler {
 		// Setting this attribute to indicate to the phantombuster front
 		// that the extension is installed.
 		*/
-		document.body.setAttribute("data-pb-extension", "true")
+		document.body.setAttribute("data-pb-extension", version)
 		return
 	}
 

@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "PhantomBuster",
-	"version": "1.1.5.5",
+	"version": "1.1.6.0",
 	"description": "This extension will allow you to easily retrieve your session cookies each time you use PhantomBuster.",
 	"icons": {
 		"16": "assets/buster-icon-16.png",
@@ -22,7 +22,8 @@
 			"matches": [
 				"*://*.phantombuster.com/*",
 				"*://*.phantombuster.io/*",
-				"*://*.zapier.com/*"
+				"*://*.zapier.com/*",
+				"*://localhost/*"
 			],
 			"run_at": "document_end",
 			"js": ["contentscript.js"],

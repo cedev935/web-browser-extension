@@ -2,6 +2,7 @@ export const extensionWebsiteDomains = [
 	"phantombuster.com",
 	"v2staging.phantombuster.io",
 	"zapier.com",
+	"localhost"
 	// "facebook.com",
 	// "github.com",
 	// "instagram.com",
@@ -158,4 +159,9 @@ export const getWebsiteInString = (name: string) => {
 		return matchingWebsites[0]
 	}
 	return null
+}
+
+export const isPhantombusterSite = () => {
+	const siteNameMeta: HTMLMetaElement | null = document.querySelector('meta[property="og:site_name"]')
+	return siteNameMeta?.content === "PhantomBuster"
 }
