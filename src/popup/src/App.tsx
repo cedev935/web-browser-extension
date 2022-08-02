@@ -1,9 +1,5 @@
 import React, { FunctionComponent } from "react"
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route
-} from "react-router-dom"
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import "pb2-css/dist/less/style.css"
 import "./App.css"
 
@@ -14,10 +10,10 @@ interface AProps {
 	href: string
 }
 
-const A: FunctionComponent<AProps> = ({children, className, href}) => {
+const A: FunctionComponent<AProps> = ({ children, className, href }) => {
 	const click = (event: React.MouseEvent<HTMLAnchorElement>) => {
 		event.preventDefault()
-		_browserMain.tabs.create({url: href})
+		_browserMain.tabs.create({ url: href })
 		window.close()
 	}
 
@@ -48,7 +44,7 @@ const App: FunctionComponent = () => {
 	return (
 		<Router>
 			<Switch>
-				<Route path="/" component={Home}/>
+				<Route path="/" component={Home} />
 				<Route path="/popup.html" component={Home} />
 				<Route path="/window.html" component={Home} />
 			</Switch>

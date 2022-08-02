@@ -22,9 +22,9 @@ type IFoundWebsites = {
 export class PhantombusterOldSetup extends Handler {
 	private _fastPoll = 100
 	private _spinnerDelay = 1000
-	private _pathnameRegex = RegExp("\/setup(?!\/step)")
+	private _pathnameRegex = RegExp("/setup(?!/step)")
 	private _interval?: ReturnType<typeof setInterval>
-	private _alpacaFieldSessionCookieDivSelector = "div[data-alpaca-field-path*=\"/sessionCookie\"]"
+	private _alpacaFieldSessionCookieDivSelector = 'div[data-alpaca-field-path*="/sessionCookie"]'
 	private _alpacaFieldSessionCookieLabelASelector = "label a"
 	private _alpacaFieldSessionCookieInputSelector = "input"
 	private _getCookieButtonClass = "pbExtensionOldSetupCookieButton"
@@ -41,11 +41,8 @@ export class PhantombusterOldSetup extends Handler {
 		 * to the new one, so this gives a false positive.
 		 * But thats's ok because any timeout or interval
 		 * created in run() should be stopped in detroy().
-		*/
-		return (
-			isPhantombusterSite() &&
-			this._pathnameRegex.test(window.location.pathname)
-		)
+		 */
+		return isPhantombusterSite() && this._pathnameRegex.test(window.location.pathname)
 	}
 
 	public onMessage = (msg: FromBackgroundRuntimeMessages) => {
@@ -93,7 +90,7 @@ export class PhantombusterOldSetup extends Handler {
 				websiteName: foundWebsite.website.name,
 				url: foundWebsite.website.url,
 				newSession,
-			}
+			},
 		})
 	}
 
@@ -112,13 +109,18 @@ export class PhantombusterOldSetup extends Handler {
 		for (const i in cookies) {
 			if (cookies[i] && foundWebsite.elements[i]) {
 				foundWebsite.elements[i].btn.textContent = `Connected to ${foundWebsite.website.name}`
-				foundWebsite.elements[i].input.style.paddingRight = (foundWebsite.elements[i].btn.offsetWidth + 18).toString(10) + "px"
+				foundWebsite.elements[i].input.style.paddingRight =
+					(foundWebsite.elements[i].btn.offsetWidth + 18).toString(10) + "px"
 				foundWebsite.elements[i].input.value = cookies[i].value
 				foundWebsite.elements[i].btn.disabled = true
-				foundWebsite.elements[i].input.addEventListener("input", () => { this._onInputChange(foundWebsite.elements) })
+				foundWebsite.elements[i].input.addEventListener("input", () => {
+					this._onInputChange(foundWebsite.elements)
+				})
 			}
 		}
-		void this.sendMessage({ notif: { message: `${this._phantomName} is now connected to ${foundWebsite.website.name}` } })
+		void this.sendMessage({
+			notif: { message: `${this._phantomName} is now connected to ${foundWebsite.website.name}` },
+		})
 	}
 
 	private _createGetCookieBtn(website: IWebsite, alpacaFieldDiv: HTMLDivElement) {
@@ -146,7 +148,7 @@ export class PhantombusterOldSetup extends Handler {
 					getCookies: {
 						websiteName: website.name,
 						newSession: event.shiftKey,
-					}
+					},
 				})
 			}
 			el.onmouseover = (event: MouseEvent) => {
@@ -155,7 +157,8 @@ export class PhantombusterOldSetup extends Handler {
 					if (event.shiftKey === true) {
 						event.target.textContent = event.target.getAttribute("textContentLogin")
 						if (event.target.nextSibling instanceof HTMLInputElement) {
-							event.target.nextSibling.style.paddingRight = (event.target.offsetWidth + 18).toString(10) + "px"
+							event.target.nextSibling.style.paddingRight =
+								(event.target.offsetWidth + 18).toString(10) + "px"
 						}
 					}
 				}
@@ -165,7 +168,8 @@ export class PhantombusterOldSetup extends Handler {
 					event.target.removeAttribute("hover")
 					event.target.textContent = event.target.getAttribute("textContentConnect")
 					if (event.target.nextSibling instanceof HTMLInputElement) {
-						event.target.nextSibling.style.paddingRight = (event.target.offsetWidth + 18).toString(10) + "px"
+						event.target.nextSibling.style.paddingRight =
+							(event.target.offsetWidth + 18).toString(10) + "px"
 					}
 				}
 			}
@@ -175,8 +179,12 @@ export class PhantombusterOldSetup extends Handler {
 	}
 
 	private _handleAlpacaFieldDiv = (alpacaFieldDiv: HTMLDivElement) => {
-		const alpacaFieldLabelA = alpacaFieldDiv?.querySelector<HTMLAnchorElement>(this._alpacaFieldSessionCookieLabelASelector)
-		const alpacaFieldInput = alpacaFieldDiv?.querySelector<HTMLInputElement>(this._alpacaFieldSessionCookieInputSelector)
+		const alpacaFieldLabelA = alpacaFieldDiv?.querySelector<HTMLAnchorElement>(
+			this._alpacaFieldSessionCookieLabelASelector,
+		)
+		const alpacaFieldInput = alpacaFieldDiv?.querySelector<HTMLInputElement>(
+			this._alpacaFieldSessionCookieInputSelector,
+		)
 
 		if (alpacaFieldLabelA && alpacaFieldInput) {
 			const elemHref = alpacaFieldLabelA.getAttribute("href")
@@ -235,7 +243,9 @@ export class PhantombusterOldSetup extends Handler {
 	}
 
 	private _findAlpacaFieldSessionCookies = () => {
-		const alpacaFieldDivs = Array.from(document.querySelectorAll<HTMLDivElement>(this._alpacaFieldSessionCookieDivSelector))
+		const alpacaFieldDivs = Array.from(
+			document.querySelectorAll<HTMLDivElement>(this._alpacaFieldSessionCookieDivSelector),
+		)
 
 		if (this._interval && alpacaFieldDivs.length) {
 			clearInterval(this._interval)
