@@ -24,4 +24,4 @@ Versions changelog:
 
 ### ⚠️ MANIFEST UPDATE WARNING
 
-Please be very careful when updating Manifest fields values like adding an entry in `permissions` or in `content_scripts.matches`, it may impact users by disabling the extension and requiring to accept new authorizations. It's already happened twice by mistake for this extension.
+Please be very careful while updating the values of the manifest fields such as adding a new entry in `permissions` or in `content_scripts.matches`. It may impact our users by disabling the extension and requiring them to accept new authorizations. It already occurred twice by mistake for this extension.
