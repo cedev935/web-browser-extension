@@ -81,7 +81,7 @@ browser.runtime.onMessage.addListener(async (msg: FromContentScriptRuntimeMessag
 	} else if (msg.getCookies && sender.tab) {
 		await getCookies(msg.getCookies.websiteName, msg.getCookies.newSession, sender.tab)
 	} else if (msg.notif) {
-		sendNotification(msg.notif.title || "Phantombuster", msg.notif.message)
+		sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
 	} else if (msg.restartMe && sender.tab && sender.tab.id) {
 		await sendMessage(sender.tab.id, { restart: true })
 	}
