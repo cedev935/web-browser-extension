@@ -23,7 +23,7 @@ jobs:
               env:
                   CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
                   PREVIOUS_COMMIT_SRC_PATH: ${{ github.workspace }}/master-commit/manifest.json
-              run: printf '::set-output name=value::%s' "$(diff -u $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH)"
+              run: printf '::set-output name=value::%s' "$(diff -u $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH | perl -pe 's/\n/\\n/g')"
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
