@@ -23,19 +23,19 @@ jobs:
               env:
                   CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
                   PREVIOUS_COMMIT_SRC_PATH: ${{ github.workspace }}/master-commit/manifest.json
-              run: printf '%s' "::set-output name=value::$(diff $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH)"
+              run: printf '::set-output name=value::%s' "$(diff -u $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH)"
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   comment-author: "github-actions[bot]"
-                  body-includes: "<"
+                  body-includes: "Manifest was updated"
             - name: Create or update comment
               uses: peter-evans/create-or-update-comment@v2
               if: steps.diff.outputs.value != ''
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
-                  body: ${{ steps.diff.outputs.value }}
+                  body: ⚠️ Manifest was updated! ${{ steps.diff.outputs.value }}
                   edit-mode: replace
