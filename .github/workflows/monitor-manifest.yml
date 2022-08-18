@@ -1,0 +1,40 @@
+name: Check manifest changes
+
+on:
+    pull_request:
+        branches-ignore:
+            - beta
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository for current commit
+              uses: actions/checkout@v2
+            - name: Checkout repository in target branch
+              uses: actions/checkout@v2
+              with:
+                  path: "./master-commit"
+                  ref: ${{ github.base_ref }}
+            - name: Check commit
+              run: cd ${{ github.workspace }}/master-commit && git log -1
+            - name: Run diff command
+              id: diff
+              env:
+                  CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
+                  PREVIOUS_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
+              run: echo "::set-output name=value::$(diff $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH)"
+            - name: Find Comment
+              uses: peter-evans/find-comment@v2
+              id: find-comment
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: "github-actions[bot]"
+                  body-includes: "<"
+            - name: Create or update comment
+              uses: peter-evans/create-or-update-comment@v2
+              with:
+                  comment-id: ${{ steps.find-comment.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: ${{ steps.diff.outputs.value }}
+                  edit-mode: replace
