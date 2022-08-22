@@ -23,7 +23,7 @@ jobs:
               env:
                   CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
                   PREVIOUS_COMMIT_SRC_PATH: ${{ github.workspace }}/master-commit/manifest.json
-              run: printf '::set-output name=value::%s' "$(diff $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH | perl -pe 's/\n/<br>/g')"
+              run: printf '::set-output name=value::%s' "$(diff $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH | perl -pe 's/\n/\\n/g')"
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
@@ -37,5 +37,5 @@ jobs:
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
-                  body: ⚠️ Manifest was updated!<br>${{ steps.diff.outputs.value }}
+                  body: ⚠️ Manifest was updated! Be very careful about this!\n```diff${{ steps.diff.outputs.value }}```
                   edit-mode: replace
