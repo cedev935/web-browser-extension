@@ -19,3 +19,9 @@ Find this extension on the [Firefox Add-ons site](https://addons.mozilla.org/fr/
 Versions changelog:
 
 [Here](https://github.com/phantombuster/web-browser-extension/releases)
+
+## Contributing
+
+### ⚠️ MANIFEST UPDATE WARNING
+
+Please be very careful while updating the values of the manifest fields such as adding a new entry in `permissions` or in `content_scripts.matches`. It may impact our users by disabling the extension and requiring them to accept new authorizations. It already occurred twice by mistake for this extension.
