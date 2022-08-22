@@ -25,7 +25,7 @@ jobs:
                   PREVIOUS_COMMIT_SRC_PATH: ${{ github.workspace }}/master-commit/manifest.json
               run: |
                   difference="$(diff $CURRENT_COMMIT_SRC_PATH $PREVIOUS_COMMIT_SRC_PATH | perl -pe 's/\n/%0A/g')"
-                  echo "::set-output name=value::difference"
+                  echo "::set-output name=value::$difference"
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
