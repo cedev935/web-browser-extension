@@ -40,7 +40,7 @@ jobs:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
-                      ## ⚠️ Manifest was updated! Be very careful about this!
+                      ## ⚠️ The Manifest was updated! Be very careful about this! ([more infos here](https://github.com/phantombuster/web-browser-extension#%EF%B8%8F-manifest-update-warning))
 
                       ```diff
                       ${{ steps.diff.outputs.value }}
