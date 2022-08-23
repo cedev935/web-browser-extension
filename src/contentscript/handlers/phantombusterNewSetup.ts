@@ -6,9 +6,9 @@ import { Cookies } from "webextension-polyfill-ts"
 interface IElement {
 	cookieName: string
 	rootElement: HTMLElement
-	inputParentElement: HTMLElement
 	input: HTMLInputElement
 	inputListener?: (event: Event) => void
+	btnContainer: HTMLElement
 	btn: HTMLButtonElement
 }
 
@@ -30,6 +30,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieRootSelector = '[id^="formField-sessionCookie"]'
 	private _stepSetupSessionCookieInputSelector = 'input[data-field-name^="sessionCookie"]'
+	private _stepSetupSessionCookieBtnContainerSelector = '[data-role^="connectButtonContainer"]'
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
@@ -169,15 +170,12 @@ export class PhantombusterNewSetup extends Handler {
 
 	private _handleStepSetupFieldDiv = (stepSetupRoot: HTMLElement) => {
 		const stepSetupInput = stepSetupRoot?.querySelector<HTMLInputElement>(this._stepSetupSessionCookieInputSelector)
-		const stepSetupInputParentElement = stepSetupInput?.parentElement
+		const stepSetupBtnContainer = stepSetupRoot?.querySelector<HTMLElement>(
+			this._stepSetupSessionCookieBtnContainerSelector,
+		)
 		const fieldInfos = stepSetupRoot.dataset.fieldInfo?.split("/")
 
-		if (
-			stepSetupInputParentElement &&
-			stepSetupInput &&
-			fieldInfos &&
-			fieldInfos.length === this._fieldInfosLength
-		) {
+		if (stepSetupInput && stepSetupBtnContainer && fieldInfos && fieldInfos.length === this._fieldInfosLength) {
 			const websiteName = fieldInfos[0] as WebsiteName
 			const cookieName = fieldInfos[1]
 
@@ -186,11 +184,11 @@ export class PhantombusterNewSetup extends Handler {
 				return
 			}
 			const btn = this._createGetCookieBtn(foundWebsite)
-			const elements = {
+			const elements: IElement = {
 				cookieName,
 				rootElement: stepSetupRoot,
-				inputParentElement: stepSetupInputParentElement,
 				input: stepSetupInput,
+				btnContainer: stepSetupBtnContainer,
 				btn,
 			}
 
@@ -252,7 +250,7 @@ export class PhantombusterNewSetup extends Handler {
 		for (const foundWebsite of Object.values(this._foundWebsites)) {
 			if (foundWebsite) {
 				for (const elements of foundWebsite.elements) {
-					elements.inputParentElement.appendChild(elements.btn)
+					elements.btnContainer.appendChild(elements.btn)
 				}
 
 				document.addEventListener("keydown", this._keydownListener)
