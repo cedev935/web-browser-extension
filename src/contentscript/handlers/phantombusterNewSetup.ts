@@ -5,7 +5,7 @@ import { Cookies } from "webextension-polyfill-ts"
 
 interface IElement {
 	cookieName: string
-	div: HTMLDivElement
+	rootElement: HTMLElement
 	inputParentElement: HTMLElement
 	input: HTMLInputElement
 	inputListener?: (event: Event) => void
@@ -28,8 +28,8 @@ export class PhantombusterNewSetup extends Handler {
 	private _fieldInfosLength = 2
 	private _pathnameRegex = RegExp("/setup/step")
 	private _interval?: ReturnType<typeof setInterval>
-	private _stepSetupSessionCookieDivSelector = 'div[id^="formField-sessionCookie"]'
-	private _stepSetupSessionCookieInputSelector = 'input[data-field-name="sessionCookie"]'
+	private _stepSetupSessionCookieRootSelector = '[id^="formField-sessionCookie"]'
+	private _stepSetupSessionCookieInputSelector = 'input[data-field-name^="sessionCookie"]'
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
@@ -167,10 +167,10 @@ export class PhantombusterNewSetup extends Handler {
 		return el
 	}
 
-	private _handleStepSetupFieldDiv = (stepSetupDiv: HTMLDivElement) => {
-		const stepSetupInput = stepSetupDiv?.querySelector<HTMLInputElement>(this._stepSetupSessionCookieInputSelector)
+	private _handleStepSetupFieldDiv = (stepSetupRoot: HTMLElement) => {
+		const stepSetupInput = stepSetupRoot?.querySelector<HTMLInputElement>(this._stepSetupSessionCookieInputSelector)
 		const stepSetupInputParentElement = stepSetupInput?.parentElement
-		const fieldInfos = stepSetupDiv.dataset.fieldInfo?.split("/")
+		const fieldInfos = stepSetupRoot.dataset.fieldInfo?.split("/")
 
 		if (
 			stepSetupInputParentElement &&
@@ -188,7 +188,7 @@ export class PhantombusterNewSetup extends Handler {
 			const btn = this._createGetCookieBtn(foundWebsite)
 			const elements = {
 				cookieName,
-				div: stepSetupDiv,
+				rootElement: stepSetupRoot,
 				inputParentElement: stepSetupInputParentElement,
 				input: stepSetupInput,
 				btn,
@@ -233,18 +233,18 @@ export class PhantombusterNewSetup extends Handler {
 	}
 
 	private _findStepSetupFieldSessionCookies = () => {
-		const stepSetupDivs = Array.from(
-			document.querySelectorAll<HTMLDivElement>(this._stepSetupSessionCookieDivSelector),
+		const stepSetupRoots = Array.from(
+			document.querySelectorAll<HTMLElement>(this._stepSetupSessionCookieRootSelector),
 		)
 
-		if (this._interval && stepSetupDivs.length) {
+		if (this._interval && stepSetupRoots.length) {
 			clearInterval(this._interval)
 		} else {
 			return
 		}
 
-		for (const stepSetupDiv of stepSetupDivs) {
-			this._handleStepSetupFieldDiv(stepSetupDiv)
+		for (const stepSetupRoot of stepSetupRoots) {
+			this._handleStepSetupFieldDiv(stepSetupRoot)
 		}
 
 		this._setPhantomName()
