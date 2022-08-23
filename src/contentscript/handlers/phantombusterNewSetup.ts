@@ -6,7 +6,7 @@ import { Cookies } from "webextension-polyfill-ts"
 interface IElement {
 	cookieName: string
 	div: HTMLDivElement
-	innerDiv: HTMLDivElement
+	inputParentElement: HTMLElement
 	input: HTMLInputElement
 	inputListener?: (event: Event) => void
 	btn: HTMLButtonElement
@@ -29,8 +29,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _pathnameRegex = RegExp("/setup/step")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieDivSelector = 'div[id^="formField-sessionCookie"]'
-	private _stepSetupSessionCookieInnerDivSelector = "div"
-	private _stepSetupSessionCookieInputSelector = "input"
+	private _stepSetupSessionCookieInputSelector = 'input[data-field-name="sessionCookie"]'
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
@@ -169,13 +168,16 @@ export class PhantombusterNewSetup extends Handler {
 	}
 
 	private _handleStepSetupFieldDiv = (stepSetupDiv: HTMLDivElement) => {
-		const stepSetupInnerDiv = stepSetupDiv?.querySelector<HTMLDivElement>(
-			this._stepSetupSessionCookieInnerDivSelector,
-		)
 		const stepSetupInput = stepSetupDiv?.querySelector<HTMLInputElement>(this._stepSetupSessionCookieInputSelector)
+		const stepSetupInputParentElement = stepSetupInput?.parentElement
 		const fieldInfos = stepSetupDiv.dataset.fieldInfo?.split("/")
 
-		if (stepSetupInnerDiv && stepSetupInput && fieldInfos && fieldInfos.length === this._fieldInfosLength) {
+		if (
+			stepSetupInputParentElement &&
+			stepSetupInput &&
+			fieldInfos &&
+			fieldInfos.length === this._fieldInfosLength
+		) {
 			const websiteName = fieldInfos[0] as WebsiteName
 			const cookieName = fieldInfos[1]
 
@@ -184,7 +186,13 @@ export class PhantombusterNewSetup extends Handler {
 				return
 			}
 			const btn = this._createGetCookieBtn(foundWebsite)
-			const elements = { cookieName, div: stepSetupDiv, innerDiv: stepSetupInnerDiv, input: stepSetupInput, btn }
+			const elements = {
+				cookieName,
+				div: stepSetupDiv,
+				inputParentElement: stepSetupInputParentElement,
+				input: stepSetupInput,
+				btn,
+			}
 
 			if (!this._foundWebsites[foundWebsite.name]) {
 				this._foundWebsites[foundWebsite.name] = { website: foundWebsite, login: false, elements: [elements] }
@@ -244,7 +252,7 @@ export class PhantombusterNewSetup extends Handler {
 		for (const foundWebsite of Object.values(this._foundWebsites)) {
 			if (foundWebsite) {
 				for (const elements of foundWebsite.elements) {
-					elements.innerDiv.appendChild(elements.btn)
+					elements.inputParentElement.appendChild(elements.btn)
 				}
 
 				document.addEventListener("keydown", this._keydownListener)
