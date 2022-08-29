@@ -29,8 +29,8 @@ export class PhantombusterNewSetup extends Handler {
 	private _pathnameRegex = RegExp("/setup/step")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieRootSelector = '[id^="formField-sessionCookie"]'
-	private _stepSetupSessionCookieInputSelector = 'input[name^="sessionCookie"]'
-	private _stepSetupSessionCookieBtnContainerSelector = '[data-role^="connectButtonContainer"]'
+	private _stepSetupSessionCookieInputSelector = 'input[data-role="sessionCookieField"]'
+	private _stepSetupSessionCookieBtnContainerSelector = '[data-role="connectButtonContainer"]'
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
