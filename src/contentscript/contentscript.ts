@@ -2,6 +2,9 @@ import "./contentscript.sass"
 import { browser } from "webextension-polyfill-ts"
 import { FromBackgroundRuntimeMessages } from "../shared/messages"
 import { handlers, Handler } from "./handlers"
+import { initSentry, wrapFunctionWithSentry } from "../shared/sentry"
+
+window.addEventListener("load", initSentry)
 
 const runtimeMessagesListener = (detectedHandlers: Handler[]) => {
 	const backgroundListener = (msg: FromBackgroundRuntimeMessages) => {
@@ -18,7 +21,7 @@ const runtimeMessagesListener = (detectedHandlers: Handler[]) => {
 			}
 		}
 	}
-	browser.runtime.onMessage.addListener(backgroundListener)
+	browser.runtime.onMessage.addListener(wrapFunctionWithSentry(backgroundListener))
 }
 
 const main = () => {
