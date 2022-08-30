@@ -3,7 +3,7 @@ name: Sentry release
 on:
     push:
         branches:
-            - beta
+            - cp-186-add-sentry
 
 jobs:
     check:
