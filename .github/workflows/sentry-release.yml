@@ -6,7 +6,7 @@ on:
             - cp-186-add-sentry
 
 jobs:
-    check:
+    release:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository for current commit
@@ -17,5 +17,5 @@ jobs:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   SENTRY_ORG: phantombuster
                   SENTRY_PROJECT: web-browser-extension
-             with:
-                 environment: production
+              with:
+                  environment: production
