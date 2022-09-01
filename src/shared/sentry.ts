@@ -23,7 +23,6 @@ export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promis
 			return result
 		} catch (error) {
 			Sentry.captureException(error)
-			throw error
 		}
 	}) as F
 }
@@ -36,7 +35,6 @@ export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(fu
 			return result
 		} catch (error) {
 			Sentry.captureException(error)
-			throw error
 		}
 	}) as F
 }
