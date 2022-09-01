@@ -17,11 +17,11 @@ const runtimeMessagesListener = (detectedHandlers: Handler[]) => {
 			return main()
 		} else {
 			for (const handler of detectedHandlers) {
-				handler.onMessage(msg)
+				wrapFunctionWithSentry(handler.onMessage)(msg)
 			}
 		}
 	}
-	browser.runtime.onMessage.addListener(wrapFunctionWithSentry(backgroundListener))
+	browser.runtime.onMessage.addListener(backgroundListener)
 }
 
 const main = () => {
