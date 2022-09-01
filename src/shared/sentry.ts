@@ -10,15 +10,29 @@ export function initSentry() {
 }
 
 export function captureRuntimeErrorIfAny() {
-	if (browser.runtime.lastError) {
-		Sentry.captureException(browser.runtime.lastError)
+	const { lastError } = browser.runtime
+	if (!lastError) {
+		return
 	}
+	if (lastError instanceof Error) {
+		Sentry.captureException(lastError)
+		return
+	}
+	if (lastError instanceof Event) {
+		Sentry.captureEvent(lastError as Sentry.Event)
+		return
+	}
+	if (lastError instanceof Object) {
+		Sentry.captureMessage(JSON.stringify(lastError))
+		return
+	}
+	Sentry.captureMessage(String(lastError))
 }
 
 export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promise<unknown>>(asyncFunction: F): F {
 	return (async (...args: Parameters<F>) => {
-		captureRuntimeErrorIfAny()
 		try {
+			captureRuntimeErrorIfAny()
 			const result = await asyncFunction(...args)
 			return result
 		} catch (error) {
@@ -29,8 +43,8 @@ export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promis
 
 export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(func: F): F {
 	return ((...args: Parameters<F>) => {
-		captureRuntimeErrorIfAny()
 		try {
+			captureRuntimeErrorIfAny()
 			const result = func(...args)
 			return result
 		} catch (error) {
