@@ -42,9 +42,9 @@ const sendMessage = async (tabId: number, msg: FromBackgroundRuntimeMessages) =>
 }
 
 // Function to be used to send notifications instead of browser.notifications.create()
-const sendNotification = (title: string, message: string) => {
+const sendNotification = async (title: string, message: string) => {
 	// tslint:disable-next-line:ban
-	browser.notifications.create({ type: "basic", message, title, iconUrl: "assets/buster-icon-48.png" })
+	return browser.notifications.create({ type: "basic", message, title, iconUrl: "assets/buster-icon-48.png" })
 }
 
 // Here we attach an a listener to each tab url change to (re)start the extension if the domain matches
@@ -84,7 +84,7 @@ browser.runtime.onMessage.addListener(
 		} else if (msg.getCookies && sender.tab) {
 			await getCookies(msg.getCookies.websiteName, msg.getCookies.newSession, sender.tab)
 		} else if (msg.notif) {
-			sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
+			await sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
 		} else if (msg.restartMe && sender.tab && sender.tab.id) {
 			await sendMessage(sender.tab.id, { restart: true })
 		}
