@@ -17,7 +17,6 @@
 			"128": "assets/buster-icon-128.png"
 		}
 	},
-	"content_security_policy": "script-src 'self' https://browser.sentry-cdn.com; object-src 'self'",
 	"content_scripts": [
 		{
 			"matches": ["*://*.phantombuster.com/*", "*://*.phantombuster.io/*", "*://*.zapier.com/*"],
