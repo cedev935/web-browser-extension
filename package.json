@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"build:contentscript-background": "NODE_ENV=production webpack --config webpack.config.js",
-		"build:beta": "cpy dist/*.js dist/*.css dist/*.map beta && jq -s '.[0] * .[1]' dist/manifest.json manifest.beta.json > beta/manifest.json",
+		"build:dev": "NODE_ENV=development webpack --config webpack.config.js",
+		"build:beta": "cpy dist/*.js dist/*.css beta && jq -s '.[0] * .[1]' dist/manifest.json manifest.beta.json > beta/manifest.json",
 		"build": "npm-run-all build:contentscript-background build:beta",
 		"watch:contentscript-background": "NODE_ENV=development webpack --config webpack.config.js -w",
 		"watch": "npm-run-all -p watch:*",
