@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build:contentscript-background": "NODE_ENV=production webpack --config webpack.config.js",
+		"build:dev": "NODE_ENV=development webpack --config webpack.config.js",
 		"build:beta": "cpy dist/*.js dist/*.css beta && jq -s '.[0] * .[1]' dist/manifest.json manifest.beta.json > beta/manifest.json",
 		"build": "npm-run-all build:contentscript-background build:beta",
 		"watch:contentscript-background": "NODE_ENV=development webpack --config webpack.config.js -w",
@@ -36,5 +37,8 @@
 		"webextension-polyfill-ts": "^0.24.0",
 		"webpack": "^5.21.2",
 		"webpack-cli": "^4.5.0"
+	},
+	"dependencies": {
+		"@sentry/browser": "^7.12.0"
 	}
 }

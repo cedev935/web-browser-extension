@@ -2,6 +2,9 @@ import { extensionWebsiteDomains, WebsiteName, getWebsiteFromName } from "../sha
 import { processCookieStr, processSetCookieStr } from "../shared/cookies"
 import { browser, Tabs, WebRequest, Runtime, Cookies } from "webextension-polyfill-ts"
 import { FromContentScriptRuntimeMessages, FromBackgroundRuntimeMessages } from "../shared/messages"
+import { initSentry, wrapAsyncFunctionWithSentry, wrapFunctionWithSentry } from "../shared/sentry"
+
+window.addEventListener("load", initSentry)
 
 const isChrome = () => {
 	return document.location.protocol.indexOf("chrome") !== -1
@@ -39,53 +42,54 @@ const sendMessage = async (tabId: number, msg: FromBackgroundRuntimeMessages) =>
 }
 
 // Function to be used to send notifications instead of browser.notifications.create()
-const sendNotification = (title: string, message: string) => {
+const sendNotification = async (title: string, message: string) => {
 	// tslint:disable-next-line:ban
-	browser.notifications
-		.create({ type: "basic", message, title, iconUrl: "assets/buster-icon-48.png" })
-		.catch((error: Error) => {
-			console.error(error)
-		})
+	return browser.notifications.create({ type: "basic", message, title, iconUrl: "assets/buster-icon-48.png" })
 }
 
 // Here we attach an a listener to each tab url change to (re)start the extension if the domain matches
 // the list of domains where we want the extension to run content scripts.
-browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
-	if (tab.url && extensionWebsiteDomains.some((v) => tab.url!.includes(v)) && changeInfo.status === "complete") {
-		await sendMessage(id, { restart: true })
-	}
-})
+browser.tabs.onUpdated.addListener(
+	wrapAsyncFunctionWithSentry(async (id, changeInfo, tab) => {
+		if (tab.url && extensionWebsiteDomains.some((v) => tab.url!.includes(v)) && changeInfo.status === "complete") {
+			await sendMessage(id, { restart: true })
+		}
+	}),
+)
 
 // At the extension installation or update (or browser update) we reload/restart on each tab matching the list
 // of domains where we want the extension to run content scripts
-browser.runtime.onInstalled.addListener(async () => {
-	const tabs = await browser.tabs.query({ url: extensionWebsiteDomains.map((url) => `*://*.${url}/*`) })
-	for (const t of tabs) {
-		if (t.id) {
-			if (isChrome()) {
-				// Google chrome does not (re)install content scripts so we need to do a full reload of the tab
-				await browser.tabs.reload(t.id)
-			} else {
-				// Firefox (re)installs content scripts directly so we just need to send the "restart" message
-				await sendMessage(t.id, { restart: true })
+browser.runtime.onInstalled.addListener(
+	wrapAsyncFunctionWithSentry(async () => {
+		const tabs = await browser.tabs.query({ url: extensionWebsiteDomains.map((url) => `*://*.${url}/*`) })
+		for (const t of tabs) {
+			if (t.id) {
+				if (isChrome()) {
+					// Google chrome does not (re)install content scripts so we need to do a full reload of the tab
+					await browser.tabs.reload(t.id)
+				} else {
+					// Firefox (re)installs content scripts directly so we just need to send the "restart" message
+					await sendMessage(t.id, { restart: true })
+				}
 			}
 		}
-	}
-})
+	}),
+)
 
 // Here we receive messages from the content scripts
-browser.runtime.onMessage.addListener(async (msg: FromContentScriptRuntimeMessages, sender: Runtime.MessageSender) => {
-	// console.log("Message received", msg)
-	if (msg.newTab && sender.tab) {
-		await newTab(msg.newTab.websiteName, msg.newTab.url, msg.newTab.newSession, sender.tab)
-	} else if (msg.getCookies && sender.tab) {
-		await getCookies(msg.getCookies.websiteName, msg.getCookies.newSession, sender.tab)
-	} else if (msg.notif) {
-		sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
-	} else if (msg.restartMe && sender.tab && sender.tab.id) {
-		await sendMessage(sender.tab.id, { restart: true })
-	}
-})
+browser.runtime.onMessage.addListener(
+	wrapAsyncFunctionWithSentry(async (msg: FromContentScriptRuntimeMessages, sender: Runtime.MessageSender) => {
+		if (msg.newTab && sender.tab) {
+			await newTab(msg.newTab.websiteName, msg.newTab.url, msg.newTab.newSession, sender.tab)
+		} else if (msg.getCookies && sender.tab) {
+			await getCookies(msg.getCookies.websiteName, msg.getCookies.newSession, sender.tab)
+		} else if (msg.notif) {
+			await sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
+		} else if (msg.restartMe && sender.tab && sender.tab.id) {
+			await sendMessage(sender.tab.id, { restart: true })
+		}
+	}),
+)
 
 const getCookies = async (websiteName: WebsiteName, newSession: boolean, senderTab: Tabs.Tab) => {
 	if (senderTab.id) {
@@ -137,7 +141,7 @@ const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean
 		prefix = getRandomPrefix()
 
 		browser.webRequest.onBeforeSendHeaders.addListener(
-			(details) => {
+			wrapFunctionWithSentry((details) => {
 				details.requestHeaders?.forEach((requestHeader) => {
 					if (requestHeader.name.toLowerCase() === "cookie" && requestHeader.value) {
 						requestHeader.value = processCookieStr(requestHeader.value, prefix)
@@ -146,7 +150,7 @@ const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean
 				return {
 					requestHeaders: details.requestHeaders,
 				}
-			},
+			}),
 			{
 				urls: ["*://*/*"],
 				tabId: tab.id,
@@ -155,7 +159,7 @@ const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean
 		)
 
 		browser.webRequest.onHeadersReceived.addListener(
-			(details) => {
+			wrapFunctionWithSentry((details) => {
 				details.responseHeaders?.forEach((responseHeader) => {
 					if (responseHeader.name.toLowerCase() === "set-cookie" && responseHeader.value) {
 						responseHeader.value = processSetCookieStr(responseHeader.value, prefix)
@@ -164,7 +168,7 @@ const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean
 				return {
 					responseHeaders: details.responseHeaders,
 				}
-			},
+			}),
 			{
 				urls: ["*://*/*"],
 				tabId: tab.id,
@@ -188,7 +192,7 @@ const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean
 		matching: [],
 		fn: (changeInfo) => cookieChanged(changeInfo, websiteName, tab, senderTab, prefix),
 	}
-	browser.cookies.onChanged.addListener(cookieChangedListeners[listenerKey].fn)
+	browser.cookies.onChanged.addListener(wrapAsyncFunctionWithSentry(cookieChangedListeners[listenerKey].fn))
 }
 
 const cookieChanged = async (
@@ -245,6 +249,8 @@ const cookieChanged = async (
 }
 
 // opens phantombuster in a new tab when clicking on the extension icon
-browser.browserAction.onClicked.addListener(async (_tab) => {
-	await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
-})
+browser.browserAction.onClicked.addListener(
+	wrapAsyncFunctionWithSentry(async (_tab) => {
+		await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
+	}),
+)

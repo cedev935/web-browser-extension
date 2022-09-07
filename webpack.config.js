@@ -1,13 +1,17 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const { optimize } = require("webpack")
 const { join } = require("path")
+
 let prodPlugins = []
 if (process.env.NODE_ENV === "production") {
 	prodPlugins.push(new optimize.AggressiveMergingPlugin())
 }
+
+const devtool = { development: "source-map" }[process.env.NODE_ENV]
+
 module.exports = {
 	mode: process.env.NODE_ENV,
-	devtool: "inline-source-map",
+	devtool,
 	entry: {
 		contentscript: join(__dirname, "src/contentscript/contentscript.ts"),
 		background: join(__dirname, "src/background/background.ts"),

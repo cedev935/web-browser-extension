@@ -1,0 +1,40 @@
+name: Sentry release
+
+on:
+    push:
+        branches:
+            - beta
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository for current commit
+              uses: actions/checkout@v2
+            - name: Build for sourcemaps
+              uses: actions/setup-node@v2
+              with:
+                  node-version-file: ".nvmrc"
+                  cache: "npm"
+                  cache-dependency-path: ${{ github.workspace }}/package-lock.json
+            - run: |
+                  npm ci
+                  npm run build:dev
+            - name: Seek manifest version
+              id: version
+              env:
+                  CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
+              run: |
+                  file="${{ github.workspace }}/manifest.json"
+                  version="$(perl -lne 'print $1 if /"version": *"([^"]+)"/' < $file)"
+                  echo "::set-output name=value::$version"
+            - name: Create Sentry release
+              uses: getsentry/action-release@v1
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  SENTRY_ORG: phantombuster
+                  SENTRY_PROJECT: web-browser-extension
+              with:
+                  environment: production
+                  version: ${{ steps.version.outputs.value }}
+                  sourcemaps: ${{ github.workspace }}/dist
