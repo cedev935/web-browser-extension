@@ -45,8 +45,7 @@ export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(fu
 	return ((...args: Parameters<F>) => {
 		try {
 			captureRuntimeErrorIfAny()
-			const result = func(...args)
-			return result
+			return func(...args)
 		} catch (error) {
 			Sentry.captureException(error)
 		}
