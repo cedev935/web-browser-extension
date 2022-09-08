@@ -1,5 +1,5 @@
 {
-	"name": "PhantomBuster TESTING",
+	"name": "PhantomBuster DEV",
 	"optional_permissions": ["*://*.phantomcompany.com/*", "*://*.phantomcompany.io/*", "*://localhost/*"],
 	"content_scripts": [
 		{

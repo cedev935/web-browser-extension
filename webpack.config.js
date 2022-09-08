@@ -6,10 +6,7 @@ const exec = require("child_process").exec
 const combineManifestPlugin = {
 	apply: (compiler) => {
 		compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
-			exec(
-				"./scripts/combineJsonFiles.js manifest.json manifest.testing.json > testing/manifest.json",
-				console.log,
-			)
+			exec("./scripts/combineJsonFiles.js manifest.json manifest.dev.json > dev-build/manifest.json", console.log)
 		})
 	},
 }
@@ -21,7 +18,7 @@ const envPlugins =
 	}[process.env.NODE_ENV] || []
 
 const devtool = process.env.NODE_ENV === "development" ? "source-map" : undefined
-const outputDir = process.env.NODE_ENV === "development" ? "testing" : "dist"
+const outputDir = process.env.NODE_ENV === "development" ? "dev-build" : "dist"
 
 module.exports = {
 	mode: process.env.NODE_ENV,

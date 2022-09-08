@@ -10,7 +10,7 @@
 		"build": "npm-run-all build:contentscript-background build:beta",
 		"watch:contentscript-background": "NODE_ENV=development webpack --config webpack.config.js -w",
 		"watch": "npm-run-all -p watch:*",
-		"clean": "rm -rf dist beta *.zip && cpy manifest.json dist && cpy src/assets/* dist/assets && cpy src/assets/* beta/assets && cpy src/assets/* testing/assets",
+		"clean": "rm -rf dist beta dev-build *.zip && cpy manifest.json dist && cpy src/assets/* dist/assets && cpy src/assets/* beta/assets && cpy src/assets/* dev-build/assets",
 		"prebuild": "npm run clean",
 		"prewatch": "npm run clean",
 		"zip:release": "cd dist && bestzip ../release.zip *",
