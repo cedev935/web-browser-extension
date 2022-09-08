@@ -11,3 +11,4 @@ build/
 js/
 *.env
 beta/
+testing/
