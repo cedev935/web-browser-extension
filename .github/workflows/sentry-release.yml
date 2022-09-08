@@ -37,4 +37,4 @@ jobs:
               with:
                   environment: production
                   version: ${{ steps.version.outputs.value }}
-                  sourcemaps: ${{ github.workspace }}/dev-build
+                  sourcemaps: ${{ github.workspace }}/dist

@@ -12,16 +12,13 @@ const combineManifestPlugin = {
 }
 
 const envPlugins =
-	{
-		production: [new optimize.AggressiveMergingPlugin()],
-		development: [combineManifestPlugin],
-	}[process.env.NODE_ENV] || []
-
-const devtool = process.env.NODE_ENV === "development" ? "source-map" : undefined
+	process.env.NODE_ENV === "development" ? [combineManifestPlugin] : [new optimize.AggressiveMergingPlugin()]
+const devtool = ["development", "sentry"].includes(process.env.NODE_ENV) ? "source-map" : undefined
 const outputDir = process.env.NODE_ENV === "development" ? "dev-build" : "dist"
+const mode = process.env.NODE_ENV === "development" ? "development" : "production"
 
 module.exports = {
-	mode: process.env.NODE_ENV,
+	mode,
 	devtool,
 	entry: {
 		contentscript: join(__dirname, "src/contentscript/contentscript.ts"),

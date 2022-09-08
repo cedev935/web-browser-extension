@@ -6,6 +6,7 @@
 	"scripts": {
 		"build:contentscript-background": "NODE_ENV=production webpack --config webpack.config.js",
 		"build:dev": "NODE_ENV=development webpack --config webpack.config.js",
+		"build:sentry": "NODE_ENV=sentry webpack --config webpack.config.js",
 		"build:beta": "cpy dist/*.js dist/*.css beta && ./scripts/combineJsonFiles.js manifest.json manifest.beta.json > beta/manifest.json",
 		"build": "npm-run-all build:contentscript-background build:beta",
 		"watch:contentscript-background": "NODE_ENV=development webpack --config webpack.config.js -w",
