@@ -25,3 +25,17 @@ Versions changelog:
 ### ⚠️ MANIFEST UPDATE WARNING
 
 Please be very careful while updating the values of the manifest fields such as adding a new entry in `permissions` or in `content_scripts.matches`. It may impact our users by disabling the extension and requiring them to accept new authorizations. It already occurred twice by mistake for this extension.
+
+### Development process
+
+To be able to use the extension on all PhantomBuster App environnement (localhost, deploy previews, etc.) and to have the source maps to debug in the browser, use the following commands:
+
+```sh
+npm run build:dev
+```
+
+or
+
+```sh
+npm run watch
+```
