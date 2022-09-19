@@ -1,0 +1,16 @@
+{
+	"name": "PhantomBuster DEV",
+	"optional_permissions": ["*://*.phantomcompany.com/*", "*://*.phantomcompany.io/*", "*://localhost/*"],
+	"content_scripts": [
+		{
+			"matches": [
+				"*://*.phantombuster.com/*",
+				"*://*.phantombuster.io/*",
+				"*://*.zapier.com/*",
+				"*://*.phantomcompany.com/*",
+				"*://*.phantomcompany.io/*",
+				"*://localhost/*"
+			]
+		}
+	]
+}

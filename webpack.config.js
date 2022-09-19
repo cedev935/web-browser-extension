@@ -1,16 +1,24 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const { optimize } = require("webpack")
 const { join } = require("path")
+const exec = require("child_process").exec
 
-let prodPlugins = []
-if (process.env.NODE_ENV === "production") {
-	prodPlugins.push(new optimize.AggressiveMergingPlugin())
+const combineManifestPlugin = {
+	apply: (compiler) => {
+		compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
+			exec("./scripts/combineJsonFiles.js manifest.json manifest.dev.json > dev-build/manifest.json", console.log)
+		})
+	},
 }
 
-const devtool = { development: "source-map" }[process.env.NODE_ENV]
+const envPlugins =
+	process.env.NODE_ENV === "development" ? [combineManifestPlugin] : [new optimize.AggressiveMergingPlugin()]
+const devtool = ["development", "sentry"].includes(process.env.NODE_ENV) ? "source-map" : undefined
+const outputDir = process.env.NODE_ENV === "development" ? "dev-build" : "dist"
+const mode = process.env.NODE_ENV === "development" ? "development" : "production"
 
 module.exports = {
-	mode: process.env.NODE_ENV,
+	mode,
 	devtool,
 	entry: {
 		contentscript: join(__dirname, "src/contentscript/contentscript.ts"),
@@ -18,7 +26,7 @@ module.exports = {
 		switchCookies: join(__dirname, "src/inject/switchCookies.ts"),
 	},
 	output: {
-		path: join(__dirname, "dist"),
+		path: join(__dirname, outputDir),
 		filename: "[name].js",
 	},
 	module: {
@@ -35,7 +43,7 @@ module.exports = {
 		],
 	},
 	plugins: [
-		...prodPlugins,
+		...envPlugins,
 		new MiniCssExtractPlugin({
 			filename: "[name].css",
 			chunkFilename: "[id].css",
