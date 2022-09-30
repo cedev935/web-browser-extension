@@ -13,6 +13,7 @@
 		"watch": "npm-run-all -p watch:*",
 		"clean": "rm -rf dist beta dev-build *.zip && cpy manifest.json dist && cpy src/assets/* dist/assets && cpy src/assets/* beta/assets && cpy src/assets/* dev-build/assets",
 		"prebuild": "npm run clean",
+		"prebuild:dev": "npm run clean",
 		"prewatch": "npm run clean",
 		"zip:release": "cd dist && bestzip ../release.zip *",
 		"zip:beta": "cd beta && bestzip ../beta.zip *"
