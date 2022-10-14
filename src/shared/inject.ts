@@ -1,10 +1,10 @@
-import { browser } from "webextension-polyfill-ts"
+import * as browser from "webextension-polyfill"
 
 const headElement = document.head || document.documentElement
 
 export const injectJsFile = (fileName: string) => {
 	const s = document.createElement("script")
-	s.src = browser.extension.getURL(fileName)
+	s.src = browser.runtime.getURL(fileName)
 	headElement.insertBefore(s, headElement.firstElementChild)
 }
 

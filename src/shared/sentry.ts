@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/browser"
-import { browser } from "webextension-polyfill-ts"
+import * as browser from "webextension-polyfill"
 import { version } from "../../manifest.json"
 
 export function initSentry() {

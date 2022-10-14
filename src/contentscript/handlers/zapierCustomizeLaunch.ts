@@ -2,7 +2,7 @@ import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { IWebsite, WebsiteName, getWebsiteInString } from "../../shared/websites"
 import { injectFunction } from "../../shared/inject"
 import { Handler } from "./handler"
-import { Cookies } from "webextension-polyfill-ts"
+import { Cookies } from "webextension-polyfill"
 
 interface IElement {
 	labelName: string

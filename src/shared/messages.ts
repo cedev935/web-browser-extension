@@ -1,5 +1,5 @@
 import { WebsiteName } from "./websites"
-import { Cookies } from "webextension-polyfill-ts"
+import { Cookies } from "webextension-polyfill"
 
 type FromBackgroundRuntimeMessages = {
 	restart?: boolean
