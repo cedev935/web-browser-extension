@@ -1,8 +1,7 @@
 import { extensionWebsiteDomains, WebsiteName, getWebsiteFromName } from "../shared/websites"
-import { processCookieStr, processSetCookieStr } from "../shared/cookies"
-import { browser, Tabs, WebRequest, Runtime, Cookies } from "webextension-polyfill-ts"
+import { browser, Tabs, Runtime, Cookies } from "webextension-polyfill-ts"
 import { FromContentScriptRuntimeMessages, FromBackgroundRuntimeMessages } from "../shared/messages"
-import { initSentry, wrapAsyncFunctionWithSentry, wrapFunctionWithSentry } from "../shared/sentry"
+import { initSentry, wrapAsyncFunctionWithSentry } from "../shared/sentry"
 
 window.addEventListener("load", initSentry)
 
@@ -20,23 +19,12 @@ const cookieChangedListeners: {
 	}
 } = {}
 
-const getListenerKey = (websiteName: WebsiteName, tab: Tabs.Tab, senderTab: Tabs.Tab, prefix: string) => {
-	return `${websiteName}_${tab.id}_${senderTab.id}_${prefix}`
-}
-
-// Chrome takes one extra option to the headers listeners that is not present in the webextension spec
-// and Firefox throws if we give it that extra option.
-// So here we have no choice but to make a special case for chrome and cast the 'extraHeaders' option.
-const onBeforeSendHeadersExtraInfoSpec: WebRequest.OnBeforeSendHeadersOptions[] = ["blocking", "requestHeaders"]
-const onHeadersReceivedExtraInfoSpec: WebRequest.OnHeadersReceivedOptions[] = ["blocking", "responseHeaders"]
-if (isChrome()) {
-	onBeforeSendHeadersExtraInfoSpec.push("extraHeaders" as WebRequest.OnBeforeSendHeadersOptions)
-	onHeadersReceivedExtraInfoSpec.push("extraHeaders" as WebRequest.OnHeadersReceivedOptions)
+const getListenerKey = (websiteName: WebsiteName, tab: Tabs.Tab, senderTab: Tabs.Tab) => {
+	return `${websiteName}_${tab.id}_${senderTab.id}`
 }
 
 // Function to be used to send message instead of browser.tabs.sendMessage()
 const sendMessage = async (tabId: number, msg: FromBackgroundRuntimeMessages) => {
-	// console.log("Message sent", msg)
 	// tslint:disable-next-line:ban
 	await browser.tabs.sendMessage(tabId, msg)
 }
@@ -80,9 +68,9 @@ browser.runtime.onInstalled.addListener(
 browser.runtime.onMessage.addListener(
 	wrapAsyncFunctionWithSentry(async (msg: FromContentScriptRuntimeMessages, sender: Runtime.MessageSender) => {
 		if (msg.newTab && sender.tab) {
-			await newTab(msg.newTab.websiteName, msg.newTab.url, msg.newTab.newSession, sender.tab)
+			await newTab(msg.newTab.websiteName, msg.newTab.url, sender.tab)
 		} else if (msg.getCookies && sender.tab) {
-			await getCookies(msg.getCookies.websiteName, msg.getCookies.newSession, sender.tab)
+			await getCookies(msg.getCookies.websiteName, sender.tab)
 		} else if (msg.notif) {
 			await sendNotification(msg.notif.title || "PhantomBuster", msg.notif.message)
 		} else if (msg.restartMe && sender.tab && sender.tab.id) {
@@ -91,106 +79,37 @@ browser.runtime.onMessage.addListener(
 	}),
 )
 
-const getCookies = async (websiteName: WebsiteName, newSession: boolean, senderTab: Tabs.Tab) => {
+const getCookies = async (websiteName: WebsiteName, senderTab: Tabs.Tab) => {
 	if (senderTab.id) {
-		if (newSession) {
+		const cookiesList = getWebsiteFromName(websiteName)?.cookies
+		if (cookiesList) {
+			const cookies = await browser.cookies.getAll({})
+			const matchingCookies = cookiesList.map(
+				(cookie) => cookies.filter((c) => c.name === cookie.name && c.domain === cookie.domain)[0],
+			)
+
+			// Whether cookies have been found or not, we send the result to the content script.
+			// The content script handles the empty|null|undefined array of cookies and asks the user to log in.
 			await sendMessage(senderTab.id, {
 				cookies: {
 					websiteName,
-					cookies: [],
-					newSession,
+					cookies: matchingCookies,
 				},
 			})
-		} else {
-			const cookiesList = getWebsiteFromName(websiteName)?.cookies
-			if (cookiesList) {
-				const cookies = await browser.cookies.getAll({})
-				const matchingCookies = cookiesList.map(
-					(cookie) => cookies.filter((c) => c.name === cookie.name && c.domain === cookie.domain)[0],
-				)
-
-				// Whether cookies have been found or not, we send the result to the content script.
-				// The content script handles the empty|null|undefined array of cookies and asks the user to log in.
-				await sendMessage(senderTab.id, {
-					cookies: {
-						websiteName,
-						cookies: matchingCookies,
-					},
-				})
-			}
 		}
 	}
 }
 
-const getRandomPrefix = () => {
-	const reserved = 10000000
-	return `pb_${Math.round(Math.random() * (Number.MAX_SAFE_INTEGER - reserved) + reserved).toString()}_`
-}
-
-const newTab = async (websiteName: WebsiteName, url: string, newSession: boolean, senderTab: Tabs.Tab) => {
+const newTab = async (websiteName: WebsiteName, url: string, senderTab: Tabs.Tab) => {
 	const tab = await browser.tabs.create({})
-	let prefix = ""
-
-	if (tab.id && newSession) {
-		// Here we want the user to login to a new session without logging out from another
-		// so we replace the "Set-Cookies" and "Cookies" headers on incoming and outgoing requests
-		// by prefixing the cookies by a unique string and removing thoses that do not start
-		// with this prefix.
-		// The listneners must be set before the page starts to load, thats why we first load a blank tab,
-		// then set-up the listeners, and finally load the website.
-		prefix = getRandomPrefix()
-
-		browser.webRequest.onBeforeSendHeaders.addListener(
-			wrapFunctionWithSentry((details) => {
-				details.requestHeaders?.forEach((requestHeader) => {
-					if (requestHeader.name.toLowerCase() === "cookie" && requestHeader.value) {
-						requestHeader.value = processCookieStr(requestHeader.value, prefix)
-					}
-				})
-				return {
-					requestHeaders: details.requestHeaders,
-				}
-			}),
-			{
-				urls: ["*://*/*"],
-				tabId: tab.id,
-			},
-			onBeforeSendHeadersExtraInfoSpec,
-		)
-
-		browser.webRequest.onHeadersReceived.addListener(
-			wrapFunctionWithSentry((details) => {
-				details.responseHeaders?.forEach((responseHeader) => {
-					if (responseHeader.name.toLowerCase() === "set-cookie" && responseHeader.value) {
-						responseHeader.value = processSetCookieStr(responseHeader.value, prefix)
-					}
-				})
-				return {
-					responseHeaders: details.responseHeaders,
-				}
-			}),
-			{
-				urls: ["*://*/*"],
-				tabId: tab.id,
-			},
-			onHeadersReceivedExtraInfoSpec,
-		)
-	}
 
 	await browser.tabs.update(tab.id, { url })
 
-	/*browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-		if (tabId === tab.id && changeInfo.status === "complete") {
-			await new Promise((resolve) => setTimeout(() => resolve(), 1000))
-			await browser.tabs.sendMessage(tab.id, { injectCookies: { prefix } })
-		}
-	})*/
-
 	// We need to store the listeners' callbacks in a global to be able to unregister/delete them later
-	const listenerKey = getListenerKey(websiteName, tab, senderTab, prefix)
+	const listenerKey = getListenerKey(websiteName, tab, senderTab)
 	cookieChangedListeners[listenerKey] = {
 		matching: [],
-		fn: (changeInfo) => cookieChanged(changeInfo, websiteName, tab, senderTab, prefix),
+		fn: (changeInfo) => cookieChanged(changeInfo, websiteName, tab, senderTab),
 	}
 	browser.cookies.onChanged.addListener(wrapAsyncFunctionWithSentry(cookieChangedListeners[listenerKey].fn))
 }
@@ -200,25 +119,19 @@ const cookieChanged = async (
 	websiteName: WebsiteName,
 	tab: Tabs.Tab,
 	senderTab: Tabs.Tab,
-	prefix: string,
 ) => {
 	if (changeInfo.removed === true) {
 		return
 	}
 
-	const listenerKey = getListenerKey(websiteName, tab, senderTab, prefix)
+	const listenerKey = getListenerKey(websiteName, tab, senderTab)
 	const cookiesList = getWebsiteFromName(websiteName)?.cookies
 	if (cookiesList && senderTab.id) {
 		const matchingCookie = cookiesList.filter(
-			(cookie) =>
-				changeInfo.cookie.name === `${prefix}${cookie.name}` && changeInfo.cookie.domain === cookie.domain,
+			(cookie) => changeInfo.cookie.name === `${cookie.name}` && changeInfo.cookie.domain === cookie.domain,
 		)
 		if (matchingCookie.length > 0) {
 			// One cookie we want has been found
-			if (prefix.length > 0) {
-				// We remove its prefix
-				changeInfo.cookie.name = changeInfo.cookie.name.substring(prefix.length, changeInfo.cookie.name.length)
-			}
 			cookieChangedListeners[listenerKey].matching.push(changeInfo.cookie)
 			if (cookiesList.length === cookieChangedListeners[listenerKey].matching.length) {
 				// All wanted cookies for this website have been found

@@ -29,8 +29,6 @@
 		"notifications",
 		"tabs",
 		"cookies",
-		"webRequest",
-		"webRequestBlocking",
 		"*://*.phantombuster.com/*",
 		"*://*.facebook.com/*",
 		"*://*.github.com/*",
