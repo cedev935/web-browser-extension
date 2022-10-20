@@ -6,6 +6,7 @@ export function initSentry() {
 	Sentry.init({
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
 		release: version,
+		ignoreErrors: ["Non-Error exception captured", "ResizeObserver loop limit exceeded"],
 	})
 }
 

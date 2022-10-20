@@ -19,7 +19,7 @@ jobs:
                   cache-dependency-path: ${{ github.workspace }}/package-lock.json
             - run: |
                   npm ci
-                  npm run build:dev
+                  npm run build:sentry
             - name: Seek manifest version
               id: version
               env:
