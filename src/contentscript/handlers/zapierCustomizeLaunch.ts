@@ -48,7 +48,7 @@ export class ZapierCustomizeLaunch extends Handler {
 
 	public onMessage = (msg: FromBackgroundRuntimeMessages) => {
 		if (msg.cookies) {
-			this._onMessageCookies(msg.cookies.websiteName, msg.cookies.cookies, msg.cookies.newSession)
+			this._onMessageCookies(msg.cookies.websiteName, msg.cookies.cookies)
 		}
 	}
 
@@ -92,18 +92,18 @@ export class ZapierCustomizeLaunch extends Handler {
 		}
 	}
 
-	private _onMessageCookies = (websiteName: WebsiteName, cookies: Cookies.Cookie[], newSession = false) => {
+	private _onMessageCookies = (websiteName: WebsiteName, cookies: Cookies.Cookie[]) => {
 		const foundWebsite = this._foundWebsites[websiteName]
 		if (foundWebsite) {
 			if (cookies.length === 0 || !cookies[0]) {
-				this._websiteLogin(foundWebsite, newSession)
+				this._websiteLogin(foundWebsite)
 			} else {
 				void this._fillInputs(foundWebsite, cookies)
 			}
 		}
 	}
 
-	private _websiteLogin = (foundWebsite: IFoundWebsite, newSession = false) => {
+	private _websiteLogin = (foundWebsite: IFoundWebsite) => {
 		foundWebsite.login = true
 		for (const element of foundWebsite.elements) {
 			element.btn.textContent = `Please log in to ${foundWebsite.website.name}`
@@ -114,7 +114,6 @@ export class ZapierCustomizeLaunch extends Handler {
 			newTab: {
 				websiteName: foundWebsite.website.name,
 				url: foundWebsite.website.url,
-				newSession,
 			},
 		})
 	}
@@ -164,11 +163,10 @@ export class ZapierCustomizeLaunch extends Handler {
 		el.setAttribute("analyticsid", "agentSetupStepsInputGetcookieBtn")
 		el.setAttribute("analyticsval1", website.name)
 
-		el.onclick = (event: MouseEvent) => {
+		el.onclick = () => {
 			void this.sendMessage({
 				getCookies: {
 					websiteName: website.name,
-					newSession: event.shiftKey,
 				},
 			})
 		}

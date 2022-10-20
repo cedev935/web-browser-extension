@@ -47,7 +47,7 @@ export class PhantombusterOldSetup extends Handler {
 
 	public onMessage = (msg: FromBackgroundRuntimeMessages) => {
 		if (msg.cookies) {
-			this._onMessageCookies(msg.cookies.websiteName, msg.cookies.cookies, msg.cookies.newSession)
+			this._onMessageCookies(msg.cookies.websiteName, msg.cookies.cookies)
 		}
 	}
 
@@ -63,22 +63,20 @@ export class PhantombusterOldSetup extends Handler {
 		for (const button of buttons) {
 			button.remove()
 		}
-		document.removeEventListener("keydown", this._keydownListener)
-		document.removeEventListener("keyup", this._keyupListener)
 	}
 
-	private _onMessageCookies = (websiteName: WebsiteName, cookies: Cookies.Cookie[], newSession = false) => {
+	private _onMessageCookies = (websiteName: WebsiteName, cookies: Cookies.Cookie[]) => {
 		const foundWebsite = this._foundWebsites[websiteName]
 		if (foundWebsite) {
 			if (cookies.length === 0 || !cookies[0]) {
-				this._websiteLogin(foundWebsite, newSession)
+				this._websiteLogin(foundWebsite)
 			} else {
 				void this._fillInputs(foundWebsite, cookies)
 			}
 		}
 	}
 
-	private _websiteLogin = (foundWebsite: IFoundWebsite, newSession = false) => {
+	private _websiteLogin = (foundWebsite: IFoundWebsite) => {
 		foundWebsite.login = true
 		for (const element of foundWebsite.elements) {
 			element.btn.textContent = `Please log in to ${foundWebsite.website.name}`
@@ -89,7 +87,6 @@ export class PhantombusterOldSetup extends Handler {
 			newTab: {
 				websiteName: foundWebsite.website.name,
 				url: foundWebsite.website.url,
-				newSession,
 			},
 		})
 	}
@@ -136,42 +133,18 @@ export class PhantombusterOldSetup extends Handler {
 		el.setAttribute("analyticsval1", website.name)
 
 		el.setAttribute("textContentConnect", `Connect to ${website.name}`)
-		el.setAttribute("textContentLogin", `Connect to ${website.name} (new session)`)
 
 		el.textContent = el.getAttribute("textContentConnect")
 
 		if (document.querySelector<HTMLDivElement>("body > #root > div")?.dataset.loggedAs === "true") {
 			el.disabled = true
 		} else {
-			el.onclick = (event: MouseEvent) => {
+			el.onclick = () => {
 				void this.sendMessage({
 					getCookies: {
 						websiteName: website.name,
-						newSession: event.shiftKey,
 					},
 				})
-			}
-			el.onmouseover = (event: MouseEvent) => {
-				if (event.target instanceof HTMLButtonElement) {
-					event.target.setAttribute("hover", "true")
-					if (event.shiftKey === true) {
-						event.target.textContent = event.target.getAttribute("textContentLogin")
-						if (event.target.nextSibling instanceof HTMLInputElement) {
-							event.target.nextSibling.style.paddingRight =
-								(event.target.offsetWidth + 18).toString(10) + "px"
-						}
-					}
-				}
-			}
-			el.onmouseout = (event: MouseEvent) => {
-				if (event.target instanceof HTMLButtonElement) {
-					event.target.removeAttribute("hover")
-					event.target.textContent = event.target.getAttribute("textContentConnect")
-					if (event.target.nextSibling instanceof HTMLInputElement) {
-						event.target.nextSibling.style.paddingRight =
-							(event.target.offsetWidth + 18).toString(10) + "px"
-					}
-				}
 			}
 		}
 
@@ -214,34 +187,6 @@ export class PhantombusterOldSetup extends Handler {
 		this._phantomName = phantomName || ""
 	}
 
-	private _keydownListener = (event: KeyboardEvent) => {
-		if (event.key === "Shift") {
-			const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(`.${this._getCookieButtonClass}`))
-			for (const button of buttons) {
-				if (button.hasAttribute("hover")) {
-					button.textContent = button.getAttribute("textContentLogin")
-					if (button.nextSibling instanceof HTMLInputElement) {
-						button.nextSibling.style.paddingRight = (button.offsetWidth + 18).toString(10) + "px"
-					}
-				}
-			}
-		}
-	}
-
-	private _keyupListener = (event: KeyboardEvent) => {
-		if (event.key === "Shift") {
-			const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(`.${this._getCookieButtonClass}`))
-			for (const button of buttons) {
-				if (button.hasAttribute("hover")) {
-					button.textContent = button.getAttribute("textContentConnect")
-					if (button.nextSibling instanceof HTMLInputElement) {
-						button.nextSibling.style.paddingRight = (button.offsetWidth + 18).toString(10) + "px"
-					}
-				}
-			}
-		}
-	}
-
 	private _findAlpacaFieldSessionCookies = () => {
 		const alpacaFieldDivs = Array.from(
 			document.querySelectorAll<HTMLDivElement>(this._alpacaFieldSessionCookieDivSelector),
@@ -266,9 +211,6 @@ export class PhantombusterOldSetup extends Handler {
 					elements.div.insertBefore(elements.btn, elements.input)
 					elements.input.style.paddingRight = ((elements.btn.offsetWidth || 200) + 18).toString(10) + "px"
 				}
-
-				document.addEventListener("keydown", this._keydownListener)
-				document.addEventListener("keyup", this._keyupListener)
 			}
 		}
 	}

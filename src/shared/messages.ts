@@ -7,7 +7,6 @@ type FromBackgroundRuntimeMessages = {
 	cookies?: {
 		websiteName: WebsiteName
 		cookies: Cookies.Cookie[]
-		newSession?: boolean
 	}
 
 	injectCookies?: {
@@ -18,13 +17,11 @@ type FromBackgroundRuntimeMessages = {
 type FromContentScriptRuntimeMessages = {
 	getCookies?: {
 		websiteName: WebsiteName
-		newSession: boolean
 	}
 
 	newTab?: {
 		websiteName: WebsiteName
 		url: string
-		newSession: boolean
 	}
 
 	notif?: {
