@@ -7,8 +7,7 @@ import { initSentry, wrapAsyncFunctionWithSentry } from "../shared/sentry"
 initSentry()
 
 const isChrome = () => {
-	return true
-	// return document.location.protocol.indexOf("chrome") !== -1
+	return location.protocol.indexOf("chrome") !== -1
 }
 
 // Only global here.
