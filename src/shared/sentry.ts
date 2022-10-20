@@ -7,6 +7,9 @@ export function initSentry() {
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
 		release: version,
 		ignoreErrors: ["Non-Error exception captured", "ResizeObserver loop limit exceeded"],
+		// Two errors are filtered because they are spamming Sentry (380 / 405 numbers of errors per day)
+		// Here are some hints for when we'll work on fixing the Non-error https://sentry.zendesk.com/hc/en-us/articles/360057389753-Why-am-I-seeing-events-with-Non-Error-exception-or-promise-rejection-captured-with-keys-using-the-JavaScript-SDK-
+		// Sentry base is price on the number volume, so at the moment, the decision taken is to ignore them.
 	})
 }
 
