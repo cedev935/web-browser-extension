@@ -1,18 +1,12 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { Handler } from "./handler"
-// import { injectJs, injectJsFile } from "../../shared/inject"
 
 export class All extends Handler {
 	public detect() {
 		return true
 	}
 
-	public onMessage(_msg: FromBackgroundRuntimeMessages) {
-		// if (msg.injectCookies) {
-		// injectJs(`window.injectedSwitchCookiePrefix = "${msg.injectCookies.prefix}";`)
-		// injectJsFile("switchCookies.js")
-		// }
-	}
+	public onMessage(_msg: FromBackgroundRuntimeMessages) {}
 
 	public async run() {
 		return

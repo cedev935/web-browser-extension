@@ -1,10 +1,10 @@
 import "./contentscript.sass"
-import { browser } from "webextension-polyfill-ts"
+import * as browser from "webextension-polyfill"
 import { FromBackgroundRuntimeMessages } from "../shared/messages"
 import { handlers, Handler } from "./handlers"
 import { initSentry, wrapFunctionWithSentry } from "../shared/sentry"
 
-window.addEventListener("load", initSentry)
+initSentry()
 
 const runtimeMessagesListener = (detectedHandlers: Handler[]) => {
 	const backgroundListener = (msg: FromBackgroundRuntimeMessages) => {

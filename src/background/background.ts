@@ -1,12 +1,13 @@
 import { extensionWebsiteDomains, WebsiteName, getWebsiteFromName } from "../shared/websites"
-import { browser, Tabs, Runtime, Cookies } from "webextension-polyfill-ts"
+import { Tabs, Runtime, Cookies } from "webextension-polyfill"
+import * as browser from "webextension-polyfill"
 import { FromContentScriptRuntimeMessages, FromBackgroundRuntimeMessages } from "../shared/messages"
 import { initSentry, wrapAsyncFunctionWithSentry } from "../shared/sentry"
 
-window.addEventListener("load", initSentry)
+initSentry()
 
 const isChrome = () => {
-	return document.location.protocol.indexOf("chrome") !== -1
+	return location.protocol.indexOf("chrome") !== -1
 }
 
 // Only global here.
@@ -162,7 +163,7 @@ const cookieChanged = async (
 }
 
 // opens phantombuster in a new tab when clicking on the extension icon
-browser.browserAction.onClicked.addListener(
+browser.action.onClicked.addListener(
 	wrapAsyncFunctionWithSentry(async (_tab) => {
 		await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
 	}),

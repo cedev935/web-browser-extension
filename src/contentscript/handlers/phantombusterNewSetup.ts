@@ -1,7 +1,7 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { IWebsite, WebsiteName, getWebsiteFromName, isPhantombusterSite } from "../../shared/websites"
 import { Handler } from "./handler"
-import { Cookies } from "webextension-polyfill-ts"
+import { Cookies } from "webextension-polyfill"
 
 interface IElement {
 	cookieName: string
