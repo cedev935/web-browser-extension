@@ -1,18 +1,4 @@
-import * as browser from "webextension-polyfill"
-
 const headElement = document.head || document.documentElement
-
-export const injectJsFile = (fileName: string) => {
-	const s = document.createElement("script")
-	s.src = browser.runtime.getURL(fileName)
-	headElement.insertBefore(s, headElement.firstElementChild)
-}
-
-export const injectJs = (content: string) => {
-	const s = document.createElement("script")
-	s.textContent = content
-	headElement.insertBefore(s, headElement.firstElementChild)
-}
 
 export const injectFunction = (func: (vals: string[]) => void, vals: string[]) => {
 	const s = document.createElement("script")
