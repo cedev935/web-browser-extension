@@ -6,6 +6,12 @@ export function initSentry() {
 	Sentry.init({
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
 		release: version,
+		// Some errors are filtered because they spam Sentry.
+		// Sentry bases its price on the amount of events, so for now the decision is to ignore them.
+		ignoreErrors: [
+			"ResizeObserver loop limit exceeded",
+			"Could not establish connection. Receiving end does not exist.",
+		],
 	})
 }
 
@@ -36,7 +42,7 @@ export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promis
 			const result = await asyncFunction(...args)
 			return result
 		} catch (error) {
-			Sentry.captureException(error)
+			Sentry.captureException(asError(error))
 		}
 	}) as F
 }
@@ -47,7 +53,18 @@ export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(fu
 			captureRuntimeErrorIfAny()
 			return func(...args)
 		} catch (error) {
-			Sentry.captureException(error)
+			Sentry.captureException(asError(error))
 		}
 	}) as F
+}
+
+function asError<T>(value: T): (T & Error) | Error {
+	if (value instanceof Error) {
+		return value
+	}
+	if (value instanceof Object) {
+		const error = new Error(JSON.stringify(value))
+		return Object.assign(error, value)
+	}
+	return new Error(String(value))
 }
