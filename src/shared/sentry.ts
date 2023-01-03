@@ -6,10 +6,12 @@ export function initSentry() {
 	Sentry.init({
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
 		release: version,
-		ignoreErrors: ["Non-Error exception captured with keys: message", "ResizeObserver loop limit exceeded"],
-		// Two errors are filtered because they are spamming Sentry (380 / 405 numbers of errors per day)
-		// Here are some hints for when we'll work on fixing the Non-error https://sentry.zendesk.com/hc/en-us/articles/360057389753-Why-am-I-seeing-events-with-Non-Error-exception-or-promise-rejection-captured-with-keys-using-the-JavaScript-SDK-
-		// Sentry base is price on the number volume, so at the moment, the decision taken is to ignore them.
+		// Some errors are filtered because they spam Sentry.
+		// Sentry bases its price on the amount of events, so for now the decision is to ignore them.
+		ignoreErrors: [
+			"ResizeObserver loop limit exceeded",
+			"Could not establish connection. Receiving end does not exist.",
+		],
 	})
 }
 
@@ -40,7 +42,7 @@ export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promis
 			const result = await asyncFunction(...args)
 			return result
 		} catch (error) {
-			Sentry.captureException(error)
+			Sentry.captureException(asError(error))
 		}
 	}) as F
 }
@@ -51,7 +53,18 @@ export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(fu
 			captureRuntimeErrorIfAny()
 			return func(...args)
 		} catch (error) {
-			Sentry.captureException(error)
+			Sentry.captureException(asError(error))
 		}
 	}) as F
+}
+
+function asError<T>(value: T): (T & Error) | Error {
+	if (value instanceof Error) {
+		return value
+	}
+	if (value instanceof Object) {
+		const error = new Error(JSON.stringify(value))
+		return Object.assign(error, value)
+	}
+	return new Error(String(value))
 }
