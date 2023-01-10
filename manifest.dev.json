@@ -1,6 +1,6 @@
 {
 	"name": "PhantomBuster DEV",
-	"optional_permissions": ["*://*.phantomcompany.com/*", "*://*.phantomcompany.io/*", "*://localhost/*"],
+	"optional_host_permissions": ["*://*.phantomcompany.com/*", "*://*.phantomcompany.io/*", "*://localhost/*"],
 	"content_scripts": [
 		{
 			"matches": [
