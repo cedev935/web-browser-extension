@@ -10,9 +10,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository for current commit
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout repository in target branch
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   path: "./master-commit"
                   ref: ${{ github.base_ref }}
