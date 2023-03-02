@@ -1,7 +1,8 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const { optimize } = require("webpack")
+const { EnvironmentPlugin, optimize } = require("webpack")
 const { join } = require("path")
 const exec = require("child_process").exec
+const { version } = require("./manifest.json")
 
 const combineManifestPlugin = {
 	apply: (compiler) => {
@@ -44,6 +45,9 @@ module.exports = {
 	},
 	plugins: [
 		...envPlugins,
+		new EnvironmentPlugin({
+			version,
+		}),
 		new MiniCssExtractPlugin({
 			filename: "[name].css",
 			chunkFilename: "[id].css",

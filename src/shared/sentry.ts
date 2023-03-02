@@ -8,12 +8,11 @@ import {
 	makeFetchTransport,
 } from "@sentry/browser"
 import * as browser from "webextension-polyfill"
-import { version } from "../../manifest.json"
 
 export function initSentry() {
 	init({
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
-		release: version,
+		release: process.env.version,
 		// Some errors are filtered because they spam Sentry.
 		// Sentry bases its price on the amount of events, so for now the decision is to ignore them.
 		ignoreErrors: [
