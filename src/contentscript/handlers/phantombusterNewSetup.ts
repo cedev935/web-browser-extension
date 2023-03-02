@@ -23,7 +23,7 @@ type IFoundWebsites = {
 }
 
 export class PhantombusterNewSetup extends Handler {
-	private _fastPoll = 100
+	private _fastPoll = 200
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
 	private _pathnameRegex = RegExp("/setup/step|/flows/\\d+/setup")
