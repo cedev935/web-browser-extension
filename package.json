@@ -40,7 +40,8 @@
 		"webpack-cli": "^4.5.0"
 	},
 	"dependencies": {
-		"@sentry/browser": "^7.16.0",
+		"@sentry/browser": "^7.40.0",
+		"@sentry/integrations": "^7.40.0",
 		"webextension-polyfill": "^0.10.0"
 	}
 }
