@@ -8,7 +8,6 @@ initSentry()
 
 const runtimeMessagesListener = (detectedHandlers: Handler[]) => {
 	const backgroundListener = (msg: FromBackgroundRuntimeMessages) => {
-		// console.log("Message received", msg)
 		if (msg.restart) {
 			browser.runtime.onMessage.removeListener(backgroundListener)
 			for (const handler of detectedHandlers) {
