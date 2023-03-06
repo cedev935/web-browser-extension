@@ -25,6 +25,7 @@ export function initSentry() {
 		// - when attempting to wrap native API
 		transport: makeFetchTransport,
 		integrations: [
+			// https://docs.sentry.io/platforms/javascript/configuration/integrations/default/#breadcrumbs
 			new Integrations.Breadcrumbs({
 				dom: false,
 				fetch: false,
