@@ -1,6 +1,5 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { Handler } from "./handler"
-import { version } from "../../../manifest.json"
 import { isPhantombusterSite } from "../../shared/websites"
 
 export class Phantombuster extends Handler {
@@ -17,7 +16,7 @@ export class Phantombuster extends Handler {
 		// Setting this attribute to indicate to the phantombuster front
 		// that the extension is installed.
 		*/
-		document.body.setAttribute("data-pb-extension", version)
+		document.body.setAttribute("data-pb-extension", process.env.version || "")
 		return
 	}
 

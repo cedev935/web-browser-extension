@@ -32,10 +32,32 @@ To be able to use the extension on all PhantomBuster App environnement (localhos
 
 ```sh
 npm run build:dev
+# or firefox:
+# npm run build:dev:firefox
 ```
 
 or
 
 ```sh
 npm run watch
+```
+
+## Packaging
+
+### Beta
+
+```sh
+npm run build:beta
+# or firefox:
+# npm run build:beta:firefox
+npm run zip:beta
+```
+
+### Stable release
+
+```sh
+npm run build
+# or firefox:
+# npm run build:firefox
+npm run zip:release
 ```

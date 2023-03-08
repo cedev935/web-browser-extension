@@ -1,16 +1,36 @@
-import * as Sentry from "@sentry/browser"
+import {
+	init,
+	captureEvent,
+	captureException,
+	captureMessage,
+	Event,
+	Integrations,
+	makeFetchTransport,
+} from "@sentry/browser"
 import * as browser from "webextension-polyfill"
-import { version } from "../../manifest.json"
 
 export function initSentry() {
-	Sentry.init({
+	init({
 		dsn: "https://a4bfab3486a647ea94cab5580874e008@o303567.ingest.sentry.io/6698508",
-		release: version,
+		release: process.env.version,
 		// Some errors are filtered because they spam Sentry.
 		// Sentry bases its price on the amount of events, so for now the decision is to ignore them.
 		ignoreErrors: [
 			"ResizeObserver loop limit exceeded",
 			"Could not establish connection. Receiving end does not exist.",
+		],
+
+		// Prevent crashing with Firefox:
+		// - when detecting fetch support
+		// - when attempting to wrap native API
+		transport: makeFetchTransport,
+		integrations: [
+			// https://docs.sentry.io/platforms/javascript/configuration/integrations/default/#breadcrumbs
+			new Integrations.Breadcrumbs({
+				dom: false,
+				fetch: false,
+				xhr: false,
+			}),
 		],
 	})
 }
@@ -21,18 +41,18 @@ export function captureRuntimeErrorIfAny() {
 		return
 	}
 	if (lastError instanceof Error) {
-		Sentry.captureException(lastError)
+		captureException(lastError)
 		return
 	}
 	if (lastError instanceof Event) {
-		Sentry.captureEvent(lastError as Sentry.Event)
+		captureEvent(lastError as Event)
 		return
 	}
 	if (lastError instanceof Object) {
-		Sentry.captureMessage(JSON.stringify(lastError))
+		captureMessage(JSON.stringify(lastError))
 		return
 	}
-	Sentry.captureMessage(String(lastError))
+	captureMessage(String(lastError))
 }
 
 export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promise<unknown>>(asyncFunction: F): F {
@@ -42,7 +62,7 @@ export function wrapAsyncFunctionWithSentry<F extends (...args: any[]) => Promis
 			const result = await asyncFunction(...args)
 			return result
 		} catch (error) {
-			Sentry.captureException(asError(error))
+			captureException(asError(error))
 		}
 	}) as F
 }
@@ -53,7 +73,7 @@ export function wrapFunctionWithSentry<F extends (...args: any[]) => unknown>(fu
 			captureRuntimeErrorIfAny()
 			return func(...args)
 		} catch (error) {
-			Sentry.captureException(asError(error))
+			captureException(asError(error))
 		}
 	}) as F
 }
