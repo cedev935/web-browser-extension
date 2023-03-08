@@ -1,7 +1,7 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { IWebsite, WebsiteName, getWebsiteFromUrl, isPhantombusterSite } from "../../shared/websites"
 import { Handler } from "./handler"
-import { Cookies } from "webextension-polyfill-ts"
+import { Cookies } from "webextension-polyfill"
 
 type IElement = {
 	div: HTMLDivElement

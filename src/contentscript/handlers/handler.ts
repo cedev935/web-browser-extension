@@ -1,5 +1,5 @@
 import { FromBackgroundRuntimeMessages, FromContentScriptRuntimeMessages } from "../../shared/messages"
-import { browser } from "webextension-polyfill-ts"
+import * as browser from "webextension-polyfill"
 
 export type HandlerClass = new () => Handler
 

@@ -1,21 +1,39 @@
+const CopyPlugin = require("copy-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const { optimize } = require("webpack")
+const { EnvironmentPlugin, optimize } = require("webpack")
 const { join } = require("path")
-const exec = require("child_process").exec
+const { exec } = require("child_process")
+const { version } = require("./manifest.json")
 
-const combineManifestPlugin = {
+const isDevelopmentMode = process.env.NODE_ENV === "development"
+const isSentryMode = process.env.NODE_ENV === "sentry"
+
+const devtool = isDevelopmentMode || isSentryMode ? "source-map" : undefined
+const outputDir = isDevelopmentMode ? "dev-build" : "dist"
+const mode = isDevelopmentMode ? "development" : "production"
+
+const target = process.env.TARGET || "chrome"
+
+const defaultChannel = isDevelopmentMode ? "dev" : "stable"
+const channel = process.env.NODE_ENV === "beta" ? "beta" : defaultChannel
+
+const CombineManifestPlugin = {
 	apply: (compiler) => {
 		compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
-			exec("./scripts/combineJsonFiles.js manifest.json manifest.dev.json > dev-build/manifest.json", console.log)
+			if (["dev", "beta"].includes(channel)) {
+				console.log(`Generate manifest for ${channel}`)
+				exec(
+					`./scripts/combineJsonFiles.js manifest.json manifest.${channel}.json > ${outputDir}/manifest.json`,
+				)
+			}
+
+			if (target === "firefox") {
+				console.log("Adjusting manifest for Firefox")
+				exec(`./scripts/patchManifestForFirefox.js ${outputDir}/manifest.json`)
+			}
 		})
 	},
 }
-
-const envPlugins =
-	process.env.NODE_ENV === "development" ? [combineManifestPlugin] : [new optimize.AggressiveMergingPlugin()]
-const devtool = ["development", "sentry"].includes(process.env.NODE_ENV) ? "source-map" : undefined
-const outputDir = process.env.NODE_ENV === "development" ? "dev-build" : "dist"
-const mode = process.env.NODE_ENV === "development" ? "development" : "production"
 
 module.exports = {
 	mode,
@@ -43,11 +61,26 @@ module.exports = {
 		],
 	},
 	plugins: [
-		...envPlugins,
+		new EnvironmentPlugin({
+			version,
+		}),
+		new CopyPlugin({
+			patterns: [
+				{
+					from: "src/assets/*.png",
+					to: "assets/[name][ext]",
+				},
+				{
+					from: "manifest.json",
+				},
+			],
+		}),
 		new MiniCssExtractPlugin({
 			filename: "[name].css",
 			chunkFilename: "[id].css",
 		}),
+		...(isDevelopmentMode ? [] : [new optimize.AggressiveMergingPlugin()]),
+		...(isSentryMode ? [] : [CombineManifestPlugin]),
 	],
 	resolve: {
 		extensions: [".ts", ".js"],

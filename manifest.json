@@ -1,7 +1,7 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "PhantomBuster",
-	"version": "1.1.6.9",
+	"version": "1.1.7.3",
 	"description": "This extension will allow you to easily retrieve your session cookies each time you use PhantomBuster.",
 	"icons": {
 		"16": "assets/buster-icon-16.png",
@@ -10,9 +10,9 @@
 	},
 	"homepage_url": "http://www.phantombuster.com/",
 	"background": {
-		"scripts": ["background.js"]
+		"service_worker": "background.js"
 	},
-	"browser_action": {
+	"action": {
 		"default_icon": {
 			"128": "assets/buster-icon-128.png"
 		}
@@ -25,10 +25,8 @@
 			"css": ["contentscript.css"]
 		}
 	],
-	"permissions": [
-		"notifications",
-		"tabs",
-		"cookies",
+	"permissions": ["notifications", "tabs", "cookies"],
+	"host_permissions": [
 		"*://*.phantombuster.com/*",
 		"*://*.facebook.com/*",
 		"*://*.github.com/*",
@@ -45,5 +43,10 @@
 		"*://*.pinterest.com/*",
 		"*://*.tiktok.com/*"
 	],
-	"web_accessible_resources": ["assets/*"]
+	"web_accessible_resources": [
+		{
+			"resources": ["assets/*"],
+			"matches": ["<all_urls>"]
+		}
+	]
 }

@@ -1,7 +1,7 @@
 import { FromBackgroundRuntimeMessages } from "../../shared/messages"
 import { IWebsite, WebsiteName, getWebsiteFromName, isPhantombusterSite } from "../../shared/websites"
 import { Handler } from "./handler"
-import { Cookies } from "webextension-polyfill-ts"
+import { Cookies } from "webextension-polyfill"
 
 interface IElement {
 	cookieName: string
@@ -23,7 +23,7 @@ type IFoundWebsites = {
 }
 
 export class PhantombusterNewSetup extends Handler {
-	private _fastPoll = 100
+	private _fastPoll = 200
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
 	private _pathnameRegex = RegExp("/setup/step|/flows/\\d+/setup")
@@ -34,6 +34,8 @@ export class PhantombusterNewSetup extends Handler {
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
+	private _getCookieBtnAnalyticsId = "agentSetupStepsInputGetcookieBtn"
+	private _getCookieBtnSelector = `button[analyticsid="${this._getCookieBtnAnalyticsId}"]`
 
 	private _phantomName: string = ""
 	private _foundWebsites: IFoundWebsites = {}
@@ -99,6 +101,9 @@ export class PhantombusterNewSetup extends Handler {
 			await new Promise((resolve) => setTimeout(resolve, this._spinnerDelay))
 			foundWebsite.login = false
 		}
+		// remove detached elements
+		foundWebsite.elements = foundWebsite.elements.filter(({ btn }) => btn.isConnected)
+
 		for (const i in cookies) {
 			if (cookies[i] && foundWebsite.elements[i]) {
 				foundWebsite.elements[i].btn.textContent = `Connected to ${foundWebsite.website.name}`
@@ -126,7 +131,7 @@ export class PhantombusterNewSetup extends Handler {
 		const el = document.createElement("button")
 		el.className = `${this._getCookieButtonClass} btn br-4 bg-dark-blue text-nowrap relative f5 mx-1 my-1`
 		el.type = "button"
-		el.setAttribute("analyticsid", "agentSetupStepsInputGetcookieBtn")
+		el.setAttribute("analyticsid", this._getCookieBtnAnalyticsId)
 		el.setAttribute("analyticsval1", website.name)
 
 		el.setAttribute("textContentConnect", `Connect to ${website.name}`)
@@ -193,9 +198,11 @@ export class PhantombusterNewSetup extends Handler {
 			document.querySelectorAll<HTMLElement>(this._stepSetupSessionCookieRootSelector),
 		)
 
-		if (this._interval && stepSetupRoots.length) {
-			clearInterval(this._interval)
-		} else {
+		if (!stepSetupRoots.length) {
+			return
+		}
+		// as this function is a loop we have to prevent multiple addition of the same elements
+		if (document.querySelector(this._getCookieBtnSelector)) {
 			return
 		}
 
