@@ -15,7 +15,8 @@
 	"action": {
 		"default_icon": {
 			"128": "assets/buster-icon-128.png"
-		}
+		},
+		"default_title": "Open PhantomBuster Dashboard"
 	},
 	"content_scripts": [
 		{
