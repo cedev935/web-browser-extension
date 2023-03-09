@@ -9,8 +9,14 @@ const isDevelopmentMode = process.env.NODE_ENV === "development"
 const isSentryMode = process.env.NODE_ENV === "sentry"
 
 const devtool = isDevelopmentMode || isSentryMode ? "source-map" : undefined
-const outputDir = isDevelopmentMode ? "dev-build" : "dist"
 const mode = isDevelopmentMode ? "development" : "production"
+const outputDir =
+	{
+		development: "dev-build",
+		beta: "beta",
+		production: "dist",
+		sentry: "dist",
+	}[process.env.NODE_ENV] ?? "dist"
 
 const target = process.env.TARGET || "chrome"
 
