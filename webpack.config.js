@@ -2,7 +2,7 @@ const CopyPlugin = require("copy-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const { EnvironmentPlugin, optimize } = require("webpack")
 const { join } = require("path")
-const { exec } = require("child_process")
+const { execSync } = require("child_process")
 const { version } = require("./manifest.json")
 
 const isDevelopmentMode = process.env.NODE_ENV === "development"
@@ -27,14 +27,14 @@ const CombineManifestPlugin = {
 		compiler.hooks.afterEmit.tap("AfterEmitPlugin", () => {
 			if (["dev", "beta"].includes(channel)) {
 				console.log(`Generate manifest for ${channel}`)
-				exec(
+				execSync(
 					`./scripts/combineJsonFiles.js manifest.json manifest.${channel}.json > ${outputDir}/manifest.json`,
 				)
 			}
 
 			if (target === "firefox") {
 				console.log("Adjusting manifest for Firefox")
-				exec(`./scripts/patchManifestForFirefox.js ${outputDir}/manifest.json`)
+				execSync(`./scripts/patchManifestForFirefox.js ${outputDir}/manifest.json`)
 			}
 		})
 	},
