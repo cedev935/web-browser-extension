@@ -16,8 +16,8 @@ filePaths.forEach((path) => {
 	}
 
 	// revert `browser_action` into `action`
-	obj.action = obj.browser_action
-	delete obj.browser_action
+	obj.browser_action = obj.action
+	delete obj.action
 
 	// add back `web_accessible_resources`
 	obj.web_accessible_resources = ["assets/*"]
