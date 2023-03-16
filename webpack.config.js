@@ -8,7 +8,6 @@ const { version } = require("./manifest.json")
 const isDevelopmentMode = process.env.NODE_ENV === "development"
 const isSentryMode = process.env.NODE_ENV === "sentry"
 
-const devtool = isDevelopmentMode || isSentryMode ? "source-map" : undefined
 const mode = isDevelopmentMode ? "development" : "production"
 const outputDir =
 	{
@@ -43,7 +42,7 @@ const CombineManifestPlugin = {
 
 module.exports = {
 	mode,
-	devtool,
+	devtool: "source-map",
 	entry: {
 		contentscript: join(__dirname, "src/contentscript/contentscript.ts"),
 		background: join(__dirname, "src/background/background.ts"),

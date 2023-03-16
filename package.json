@@ -14,8 +14,8 @@
 		"watch": "npm run build:dev -- --watch",
 		"clean": "rm -rf dist beta dev-build *.zip",
 		"prebuild": "npm run clean",
-		"zip:release": "cd dist && bestzip ../release.zip *",
-		"zip:beta": "cd beta && bestzip ../beta.zip *"
+		"zip:release": "cd dist && rm *.map && bestzip ../release.zip *",
+		"zip:beta": "cd beta && rm *.map && bestzip ../beta.zip *"
 	},
 	"keywords": [],
 	"author": "",
