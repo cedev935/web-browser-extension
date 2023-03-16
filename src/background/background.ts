@@ -163,8 +163,11 @@ const cookieChanged = async (
 }
 
 // opens phantombuster in a new tab when clicking on the extension icon
-browser.action.onClicked.addListener(
-	wrapAsyncFunctionWithSentry(async (_tab) => {
-		await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
-	}),
-)
+;(function registerClickOnExtensionIcon() {
+	const _action = isChrome() ? browser.action : browser.browserAction
+	_action.onClicked.addListener(
+		wrapAsyncFunctionWithSentry(async (_tab) => {
+			await browser.tabs.create({ url: "https://phantombuster.com/phantoms" })
+		}),
+	)
+})()
