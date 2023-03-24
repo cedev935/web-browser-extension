@@ -35,3 +35,4 @@ jobs:
                   environment: production
                   version: ${{ steps.version.outputs.value }}
                   sourcemaps: ${{ github.workspace }}/dist
+                  url_prefix: "~/"
