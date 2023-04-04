@@ -21,12 +21,10 @@ jobs:
                   npm run build:sentry
             - name: Seek manifest version
               id: version
-              env:
-                  CURRENT_COMMIT_SRC_PATH: ${{ github.workspace }}/manifest.json
               run: |
                   file="${{ github.workspace }}/manifest.json"
                   version="$(perl -lne 'print $1 if /"version": *"([^"]+)"/' < $file)"
-                  echo "::set-output name=value::$version"
+                  echo "value=$version" >> $GITHUB_OUTPUT
             - name: Create Sentry release
               uses: getsentry/action-release@v1
               env:
@@ -37,3 +35,4 @@ jobs:
                   environment: production
                   version: ${{ steps.version.outputs.value }}
                   sourcemaps: ${{ github.workspace }}/dist
+                  url_prefix: "~/"
