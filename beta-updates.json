@@ -33,6 +33,10 @@
 				{
 					"version": "1.1.7.5",
 					"update_link": "https://github.com/phantombuster/web-browser-extension/releases/download/v1.1.7.5/firefox-1.1.7.5.xpi"
+				},
+				{
+					"version": "1.1.7.6",
+					"update_link": "https://github.com/phantombuster/web-browser-extension/releases/download/v1.1.7.6/firefox-1.1.7.6.xpi"
 				}
 			]
 		}
