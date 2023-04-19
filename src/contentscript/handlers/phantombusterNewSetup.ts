@@ -26,7 +26,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _fastPoll = 200
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
-	private _pathnameRegex = RegExp("/setup/step|/flows/\\d+/setup")
+	private _pathnameRegex = RegExp("/setup/step|/flows/\\d+/setup|/phantoms/\\d+/dashboard|/phantoms/\\d+/console")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieRootSelector = '[id^="formField-sessionCookie"]'
 	private _stepSetupSessionCookieInputSelector = 'input[data-role="sessionCookieField"]'
@@ -34,6 +34,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _getCookieButtonClass = "pbExtensionNewSetupCookieButton"
 	private _phantomNameSelector1 = "header p"
 	private _phantomNameSelector2 = "aside header span"
+	private _phantomNameSelector3 = '[id^="agent-name"]'
 	private _getCookieBtnAnalyticsId = "agentSetupStepsInputGetcookieBtn"
 	private _getCookieBtnSelector = `button[analyticsid="${this._getCookieBtnAnalyticsId}"]`
 
@@ -189,6 +190,9 @@ export class PhantombusterNewSetup extends Handler {
 		let phantomName = document.querySelector<HTMLParagraphElement>(this._phantomNameSelector1)?.textContent
 		if (!phantomName || phantomName.trim() === "Setup") {
 			phantomName = document.querySelector<HTMLSpanElement>(this._phantomNameSelector2)?.textContent
+		}
+		if (this._phantomNameSelector3) {
+			phantomName = document.querySelector<HTMLSpanElement>(this._phantomNameSelector3)?.textContent
 		}
 		this._phantomName = phantomName || ""
 	}
