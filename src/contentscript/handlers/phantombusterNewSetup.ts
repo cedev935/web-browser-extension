@@ -26,7 +26,7 @@ export class PhantombusterNewSetup extends Handler {
 	private _fastPoll = 200
 	private _spinnerDelay = 1000
 	private _fieldInfosLength = 2
-	private _pathnameRegex = RegExp("/setup/step|/flows/\\d+/setup|/phantoms/\\d+/dashboard|/phantoms/\\d+/console")
+	private _pathnameRegex = RegExp("/setup/step")
 	private _interval?: ReturnType<typeof setInterval>
 	private _stepSetupSessionCookieRootSelector = '[id^="formField-sessionCookie"]'
 	private _stepSetupSessionCookieInputSelector = 'input[data-role="sessionCookieField"]'
